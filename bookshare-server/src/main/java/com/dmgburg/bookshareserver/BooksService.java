@@ -2,15 +2,16 @@ package com.dmgburg.bookshareserver;
 
 import com.dmgburg.bookshareserver.domain.Book;
 import com.dmgburg.bookshareserver.domain.Cover;
+import com.dmgburg.bookshareserver.domain.UserInteraction;
 import com.dmgburg.bookshareserver.repository.BooksRepository;
 import com.dmgburg.bookshareserver.repository.CoverRepository;
+import com.dmgburg.bookshareserver.repository.UserInteractionRepository;
 import com.google.common.collect.Lists;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,10 +32,17 @@ import java.util.Optional;
 public class BooksService {
     private final BooksRepository booksRepository;
     private final CoverRepository coverRepository;
+    private final UserInteractionRepository userInteractionRepository;
+    private final MailingService mailingService;
 
-    public BooksService(BooksRepository booksRepository, CoverRepository coverRepository) {
+    public BooksService(BooksRepository booksRepository,
+                        CoverRepository coverRepository,
+                        UserInteractionRepository userInteractionRepository,
+                        MailingService mailingService) {
         this.booksRepository = booksRepository;
         this.coverRepository = coverRepository;
+        this.userInteractionRepository = userInteractionRepository;
+        this.mailingService = mailingService;
     }
 
     @GetMapping("/allBooks")
@@ -53,12 +61,31 @@ public class BooksService {
         return ResponseEntity.of(booksRepository.findById(id));
     }
 
+    @GetMapping("/askForBook/{id}")
+    public ResponseEntity<Long> askForBook(@PathVariable("id") Long id, Principal principal) throws IOException {
+        Optional<Book> optionalBook = booksRepository.findById(id);
+        if (!optionalBook.isPresent()){
+            return ResponseEntity.notFound().build();
+        }
+        Book book = optionalBook.get();
+        UserInteraction userInteraction = new UserInteraction();
+        userInteraction.setFromUser(principal.getName());
+        userInteraction.setToUser(book.getHolder());
+        userInteraction.setBook(book);
+        userInteraction = userInteractionRepository.save(userInteraction);
+//        mailingService.sendBookReqest(book.getHolder(),
+//                principal.getName(),
+//                principal.getName(),
+//                userInteraction.getId());
+        return ResponseEntity.ok(userInteraction.getId());
+    }
+
     @PostMapping("/addBook")
     @ResponseBody
     public Long addBook(@RequestBody Book book, Principal principal) {
         String name = principal.getName();
         book.setOwner(name);
-        book.setOwner(name);
+        book.setHolder(name);
         return booksRepository.save(book).getId();
     }
 

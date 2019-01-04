@@ -14,19 +14,27 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
+    private DataSource dataSource;
+
+    @Autowired
     private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
     @Bean
     public PersistentTokenRepository tokenRepository() {
-        return new InMemoryTokenRepositoryImpl();
+        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+        jdbcTokenRepository.setDataSource(dataSource);
+        return jdbcTokenRepository;
     }
 
     @Bean
@@ -55,10 +63,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/**")
                     .permitAll()
                 .and()
+                    .rememberMe()
+                    .rememberMeParameter("remember-me")
+                    .tokenRepository(tokenRepository())
+                    .tokenValiditySeconds(86400)
+                .and()
                     .formLogin()
                     .successHandler(authSuccessHandler())
                     .failureHandler(authFailureHandler());
-        ;
     }
 
     @Bean

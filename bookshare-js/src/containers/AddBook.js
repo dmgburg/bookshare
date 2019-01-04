@@ -61,6 +61,21 @@ export default class AddBook extends React.Component {
         this.submitBook();
     }
 
+    //  TODO: move this logic to higher order
+      componentDidMount(){
+        const history = this.props.history
+        if(!this.context.email) {
+            history.push("/")
+        }
+      }
+
+      componentDidUpdate(){
+        const history = this.props.history
+        if(!this.context.email) {
+            history.push("/")
+        }
+      }
+
 //    TODO: adjust inputs left and right
     render() {
         return (

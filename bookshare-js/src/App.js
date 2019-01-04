@@ -6,7 +6,8 @@ import LoginWithRouter from "./containers/Login";
 import RegisterWithRouter from "./containers/Register";
 import Header from "./containers/Header";
 import Books from "./containers/Books";
-import BookDetails from "./containers/BookDetails";
+import BookDetailsWithRouter from "./containers/BookDetails";
+import InteractionsWithRouter from "./containers/Interactions";
 import AddBookWithRouter from "./containers/AddBook";
 import { UserContext } from "./UserContext";
 import { BrowserRouter as Router, Route } from "react-router-dom";
@@ -67,7 +68,8 @@ class App extends Component {
                  <Route path="/addBook" component={AddBookWithRouter} />
                  <Route path="/signin" component={LoginWithRouter} />
                  <Route path="/signup" component={RegisterWithRouter} />
-                 <Route path="/bookDetails/:id" component={BookDetails} />
+                 <Route path="/interactions" component={InteractionsWithRouter} />
+                 <Route path="/bookDetails/:id" component={BookDetailsWithRouter} />
               </UserContext.Provider>
             </div>
            </div>

@@ -27,6 +27,14 @@ public class User implements UserDetails {
     @JsonProperty("passwordSalt")
     private String passwordSalt;
 
+    @Column(name = "confirmationPending")
+    @JsonProperty("confirmationPending")
+    private String confirmationPending;
+
+    @Column(name = "confirmationPendingSentAt")
+    @JsonProperty("confirmationPendingSentAt")
+    private Long confirmationPendingSentAt;
+
     public String getEmail() {
         return email;
     }
@@ -85,4 +93,20 @@ public class User implements UserDetails {
         return true;
     }
 
+    @JsonIgnore
+    public String getConfirmationPending() {
+        return confirmationPending;
+    }
+
+    public void setConfirmationPending(String confirmationPending) {
+        this.confirmationPending = confirmationPending;
+    }
+
+    public Long getConfirmationPendingSentAt() {
+        return confirmationPendingSentAt;
+    }
+
+    public void setConfirmationPendingSentAt(Long confirmationPendingSentAt) {
+        this.confirmationPendingSentAt = confirmationPendingSentAt;
+    }
 }

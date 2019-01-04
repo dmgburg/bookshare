@@ -1,12 +1,14 @@
 package com.dmgburg.bookshareserver.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.SequenceGenerator;
 
 @Entity
@@ -21,6 +23,8 @@ public class Book {
     @JsonProperty("name")
     private String name;
 
+    @Lob
+    @Type(type="text")
     @Column(name = "description")
     @JsonProperty("description")
     private String description;
@@ -61,5 +65,13 @@ public class Book {
 
     public void setHolder(String holder) {
         this.holder = holder;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public String getHolder() {
+        return holder;
     }
 }

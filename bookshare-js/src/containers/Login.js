@@ -38,6 +38,7 @@ export default class Login extends React.Component {
            var params = new URLSearchParams();
            params.append('username', email);
            params.append('password', value);
+           params.append('remember-me', "true");
            const response = await axios.post('/login', params);
            console.log(JSON.stringify(response));
            this.context.setEmail(response.data)
@@ -56,14 +57,14 @@ export default class Login extends React.Component {
   componentDidMount(){
     const history = this.props.history
     if(this.context.email) {
-        history.push("/")
+        history.goBack()
     }
   }
 
   componentDidUpdate(){
     const history = this.props.history
     if(this.context.email) {
-        history.push("/")
+        history.goBack()
     }
   }
 
