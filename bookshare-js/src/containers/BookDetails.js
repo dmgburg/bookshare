@@ -86,8 +86,11 @@ class RequestButton extends React.Component{
         if(!this.props.email){
             return null
         }
-        if (this.props.email === this.props.holder){
+        if (this.props.email === this.props.book.holder && this.props.email !== this.props.book.holder){
             return (<div className="btn btn-success mt-2" onClick={this.props.askForBook}>Вернуть книгу</div>)
+        }
+        if (this.props.email === this.props.book.holder && this.props.email === this.props.book.owner){
+            return (<div className="btn btn-success mt-2 disabled">Это ваша книга</div>)
         }
         return (<div className="btn btn-success mt-2" onClick={this.props.askForBook}>Попросить книгу</div>)
     }

@@ -29,6 +29,7 @@ class App extends Component {
 
     instance.get("/currentUser").then((responce) => {
         this.setState( {
+          init: true,
           email: responce.data,
           axios: instance,
           setEmail: this.setEmail,
@@ -36,6 +37,7 @@ class App extends Component {
     })
 
     this.state = {
+      init: false,
       email: "",
       axios: instance,
       setEmail: this.setEmail,
@@ -57,6 +59,9 @@ class App extends Component {
   }
 
   render() {
+    if(!this.state.init){
+        return (<div>loading</div>)
+    }
     return (
         <Router>
            <div>

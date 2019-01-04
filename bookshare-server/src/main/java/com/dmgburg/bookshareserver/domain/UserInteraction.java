@@ -1,5 +1,6 @@
 package com.dmgburg.bookshareserver.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Column;
@@ -9,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 
@@ -31,13 +31,18 @@ public class UserInteraction {
     @JsonProperty("fromUser")
     private String fromUser;
 
-    @Column(name = "to")
-    @JsonProperty("to")
+    @Column(name = "toUser")
+    @JsonProperty("toUser")
     private String toUser;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "BOOK_ID")
+    @JsonProperty("book")
     private Book book;
+
+    @Column(name = "active")
+    @JsonIgnore
+    private boolean active;
 
     @Override
     public String toString() {
@@ -87,5 +92,13 @@ public class UserInteraction {
 
     public void setBook(Book book) {
         this.book = book;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

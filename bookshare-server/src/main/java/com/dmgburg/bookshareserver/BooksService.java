@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,8 +25,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000")
 @RestController
@@ -72,12 +76,42 @@ public class BooksService {
         userInteraction.setFromUser(principal.getName());
         userInteraction.setToUser(book.getHolder());
         userInteraction.setBook(book);
+        userInteraction.setActive(true);
         userInteraction = userInteractionRepository.save(userInteraction);
 //        mailingService.sendBookReqest(book.getHolder(),
 //                principal.getName(),
 //                principal.getName(),
 //                userInteraction.getId());
         return ResponseEntity.ok(userInteraction.getId());
+    }
+
+    @GetMapping("/getMyInteractions")
+    public List<UserInteraction> getMyInteractions(Principal principal) {
+        return userInteractionRepository
+                .findByFromUser(principal.getName())
+                .stream()
+                .filter(UserInteraction::isActive)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/getInteractionsToMe")
+    public List<UserInteraction> getInteractionsToMe(Principal principal) {
+        return userInteractionRepository
+                .findByToUser(principal.getName())
+                .stream()
+                .filter(UserInteraction::isActive)
+                .collect(Collectors.toList());
+    }
+
+    @PostMapping("/cancelInteraction")
+    public ResponseEntity<UserInteraction> cancelInteraction(@RequestParam("id") long interactionId, Principal principal) {
+        Optional<UserInteraction> optionalUserInteraction = userInteractionRepository.findById(interactionId);
+        if (!optionalUserInteraction.isPresent()){
+            return ResponseEntity.notFound().build();
+        }
+        UserInteraction userInteraction = optionalUserInteraction.get();
+        userInteraction.setActive(false);
+        return ResponseEntity.ok(userInteraction);
     }
 
     @PostMapping("/addBook")

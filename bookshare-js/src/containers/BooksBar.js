@@ -17,8 +17,11 @@ BooksBar.contextType = UserContext;
 class UserBooksBar  extends React.Component {
     constructor (props){
         super(props)
-
         this.handleClick = this.handleClick.bind(this)
+
+        this.state = {
+            requestsToMe: 0
+        }
     }
 
     async onLogout() {
@@ -33,7 +36,14 @@ class UserBooksBar  extends React.Component {
         event.preventDefault();
         this.onLogout();
         this.context.setEmail(null);
+    }
 
+    componentDidMount(){
+        this.context.axios.get("/getInteractionsToMe").then((resp) =>{
+            this.setState({
+                requestsToMe: resp.data.length,
+            })
+        })
     }
 
     render() {
@@ -49,11 +59,18 @@ class UserBooksBar  extends React.Component {
                 <li className="nav-item active">
                     <Link className="nav-link" to="/addBook">Добавить книгу</Link>
                 </li>
+                <li className="nav-item active">
+                    <Link className="nav-link" to="/interactions">Запросы
+                        {this.state.requestsToMe ?
+                            <span class="badge badge-success">{this.state.requestsToMe}</span> :
+                            null}
+                    </Link>
+                </li>
             </ul>
         )
     }
 }
-UserBooksBar .contextType = UserContext;
+UserBooksBar.contextType = UserContext;
 
 class GuestBooksBar  extends React.Component {
   render() {
