@@ -34,7 +34,7 @@ export default class Books extends React.Component {
   }
 
  static imageRenderer(params) {
-   return `<span><img width="150" height="200" align="middle" style="margin:10px 0px" src=${ "http://localhost:8080/api/book/public/getCover/" + params.value}></span>`;
+   return `<span><img width="150" height="200" align="middle" style="margin:10px 0px" src=${ "/api/book/public/getCover/" + params.value}></span>`;
  }
 
   onRowSelected(event) {

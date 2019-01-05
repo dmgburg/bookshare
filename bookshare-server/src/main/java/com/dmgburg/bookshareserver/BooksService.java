@@ -7,6 +7,7 @@ import com.dmgburg.bookshareserver.domain.UserInteraction;
 import com.dmgburg.bookshareserver.repository.BooksRepository;
 import com.dmgburg.bookshareserver.repository.CoverRepository;
 import com.dmgburg.bookshareserver.repository.UserInteractionRepository;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -26,9 +27,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.dmgburg.bookshareserver.domain.InteractionState.*;
 
 @CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000")
 @RestController
@@ -90,7 +97,7 @@ public class BooksService {
         userInteraction.setFromUser(principal.getName());
         userInteraction.setToUser(book.getHolder());
         userInteraction.setBook(book);
-        userInteraction.setState(InteractionState.NEW);
+        userInteraction.setState(NEW);
         userInteraction = userInteractionRepository.save(userInteraction);
 //        mailingService.sendBookReqest(book.getHolder(),
 //                principal.getName(),
@@ -104,9 +111,8 @@ public class BooksService {
         return userInteractionRepository
                 .findByFromUser(principal.getName())
                 .stream()
-                .filter(inter -> inter.getState() != InteractionState.CLOSED
-                        && inter.getState() != InteractionState.SUCCESS
-                        && inter.getState() != InteractionState.CANCELLED)
+                .filter(inter -> inter.getState() != CLOSED
+                        && inter.getState() != CANCELLED)
                 .collect(Collectors.toList());
     }
 
@@ -115,39 +121,45 @@ public class BooksService {
         return userInteractionRepository
                 .findByToUser(principal.getName())
                 .stream()
-                .filter(inter -> inter.getState() == InteractionState.NEW)
+                .filter(inter -> inter.getState() == NEW)
                 .collect(Collectors.toList());
     }
 
     @PostMapping("/cancelInteraction")
     public ResponseEntity<UserInteraction> cancelInteraction(@RequestParam("id") long interactionId) {
-        return setInteractionsState(interactionId, InteractionState.NEW, InteractionState.CANCELLED);
+        return setInteractionsState(interactionId, NEW, CANCELLED);
     }
 
     @PostMapping("/successInteraction")
     public ResponseEntity<UserInteraction> successInteraction(@RequestParam("id") long interactionId) {
-        return setInteractionsState(interactionId, InteractionState.NEW, InteractionState.SUCCESS);
+        return setInteractionsState(interactionId, NEW, SUCCESS);
     }
 
     @PostMapping("/rejectInteraction")
     public ResponseEntity<UserInteraction> rejectInteraction(@RequestParam("id") long interactionId) {
-        return setInteractionsState(interactionId, InteractionState.NEW, InteractionState.REJECTED);
+        return setInteractionsState(interactionId, NEW, REJECTED);
     }
 
     @PostMapping("/closeInteraction")
     public ResponseEntity<UserInteraction> closeInteraction(@RequestParam("id") long interactionId) {
-        return setInteractionsState(interactionId, InteractionState.REJECTED, InteractionState.CLOSED);
+        return setInteractionsState(interactionId, Arrays.asList(REJECTED, SUCCESS), CLOSED);
     }
 
     private ResponseEntity<UserInteraction> setInteractionsState(long interactionId,
                                                                  InteractionState expected,
+                                                                 InteractionState state) {
+        return setInteractionsState(interactionId, Collections.singleton(expected), state);
+    }
+
+    private ResponseEntity<UserInteraction> setInteractionsState(long interactionId,
+                                                                 Collection<InteractionState> expected,
                                                                  InteractionState state) {
         Optional<UserInteraction> optionalUserInteraction = userInteractionRepository.findById(interactionId);
         if (!optionalUserInteraction.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         UserInteraction userInteraction = optionalUserInteraction.get();
-        if (userInteraction.getState() != expected){
+        if (!expected.contains(userInteraction.getState())){
             throw new IllegalStateException("Expected interation with state " + expected + ", got " + userInteraction.getState());
         }
         userInteraction.setState(state);

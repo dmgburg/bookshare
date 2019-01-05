@@ -48,7 +48,7 @@ export default class BookDetails extends React.Component {
                 <div className="row">
                     <div className="col-md-4">
                         <span>
-                            <img className="img-fluid w-100" alt="" src={this.state.book.coverId ? "http://localhost:8080/api/book/public/getCover/" + this.state.book.coverId : "/defaultCover.png" }/>
+                            <img className="img-fluid w-100" alt="" src={this.state.book.coverId ? "/api/book/public/getCover/" + this.state.book.coverId : "/defaultCover.png" }/>
                         </span>
                     </div>
                     <div className="col-md-8">
