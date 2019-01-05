@@ -19,7 +19,7 @@ import org.springframework.web.servlet.view.RedirectView;
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
     private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
-            "classpath:/META-INF/resources/", "classpath:/resources/",
+            "classpath:/META-INF/resources/", "classpath:/WEB-INF/",
             "classpath:/static/", "classpath:/public/" , "classpath:/" };
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
