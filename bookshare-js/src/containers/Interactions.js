@@ -230,7 +230,7 @@ class MyRequestsRenderer extends React.Component{
                     <button className="btn btn-success btn-block" onClick={this.closeInteraction}>OK</button>
                 </div>
             </div>)
-        } else if (this.props.data.state === "REJECTED") {
+        } else if (this.props.data.state === "SUCCESS") {
             return (<div>
                 <div>
                     Книгу можно забирать
