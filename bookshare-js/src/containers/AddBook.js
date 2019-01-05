@@ -37,9 +37,9 @@ export default class AddBook extends React.Component {
           const formData = new FormData();
           formData.append("data", this.state.image)
 
-          const coverId = await axios.post('http://localhost:8080/uploadCover', formData);
+          const coverId = await axios.post('http://localhost:8080/api/book/uploadCover', formData);
           book.coverId = coverId.data
-          const bookId = await axios.post('http://localhost:8080/addBook', book );
+          const bookId = await axios.post('http://localhost:8080/api/book/addBook', book );
           console.log(bookId);
           this.props.history.push("/bookDetails/" + bookId.data)
        } catch (err) {

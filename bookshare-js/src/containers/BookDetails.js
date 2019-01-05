@@ -13,14 +13,15 @@ export default class BookDetails extends React.Component {
 
     async askForBook(){
         const axios = this.context.axios;
-        const response = await axios.get("/askForBook/" + this.state.book.id)
+        const response = await axios.get("/api/book/askForBook/" + this.state.book.id)
         console.log(response.data)
         this.props.history.push("/interactions")
     }
 
     async returnBook(){
         const axios = this.context.axios;
-        const response = await axios.get("/returnBook/" + this.state.book.id)
+
+        const response = await axios.get("/api/book/returnBook/" + this.state.book.id)
         console.log(response.data)
         this.props.history.push("/interactions")
     }
@@ -31,7 +32,7 @@ export default class BookDetails extends React.Component {
 
     async fetchState(){
         try{
-        const bookResp = await this.context.axios.get('/getBook/' + this.props.match.params.id);
+        const bookResp = await this.context.axios.get('/api/book/public/getBook/' + this.props.match.params.id);
         console.log("Got book data:" + bookResp);
         this.setState({
             book: bookResp.data
@@ -47,7 +48,7 @@ export default class BookDetails extends React.Component {
                 <div className="row">
                     <div className="col-md-4">
                         <span>
-                            <img className="img-fluid w-100" alt="" src={this.state.book.coverId ? "http://localhost:8080/getCover/" + this.state.book.coverId : "/defaultCover.png" }/>
+                            <img className="img-fluid w-100" alt="" src={this.state.book.coverId ? "http://localhost:8080/api/book/public/getCover/" + this.state.book.coverId : "/defaultCover.png" }/>
                         </span>
                     </div>
                     <div className="col-md-8">

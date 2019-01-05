@@ -8,7 +8,7 @@ export default class Header extends React.Component {
         return (
           <nav className="navbar navbar-expand-lg navbar-light bg-light">
               <div id="navbarNavDropdown" className="navbar-collapse">
-                  <Link className="navbar-brand" to="/">Navbar</Link>
+                  <Link className="navbar-brand" to="/"></Link>
                       <BooksBar />
                       <LoginBar />
               </div>

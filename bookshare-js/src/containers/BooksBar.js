@@ -39,7 +39,7 @@ class UserBooksBar  extends React.Component {
     }
 
     componentDidMount(){
-        this.context.axios.get("/getInteractionsToMe").then((resp) =>{
+        this.context.axios.get("/api/book/getInteractionsToMe").then((resp) =>{
             this.setState({
                 requestsToMe: resp.data.length,
             })
@@ -47,7 +47,6 @@ class UserBooksBar  extends React.Component {
     }
 
     render() {
-        let user = this.context.email
         return (
             <ul className="navbar-nav mr-auto">
                 <li className="nav-item active">
@@ -62,7 +61,7 @@ class UserBooksBar  extends React.Component {
                 <li className="nav-item active">
                     <Link className="nav-link" to="/interactions">Запросы
                         {this.state.requestsToMe ?
-                            <span class="badge badge-success">{this.state.requestsToMe}</span> :
+                            <span className="badge badge-success ml-1">{this.state.requestsToMe}</span> :
                             null}
                     </Link>
                 </li>

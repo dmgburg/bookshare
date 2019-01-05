@@ -2,6 +2,7 @@ package com.dmgburg.bookshareserver;
 
 import com.dmgburg.bookshareserver.domain.Book;
 import com.dmgburg.bookshareserver.domain.Cover;
+import com.dmgburg.bookshareserver.domain.InteractionState;
 import com.dmgburg.bookshareserver.domain.UserInteraction;
 import com.dmgburg.bookshareserver.repository.BooksRepository;
 import com.dmgburg.bookshareserver.repository.CoverRepository;
@@ -14,10 +15,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,14 +26,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000")
 @RestController
+@RequestMapping("/api/book")
 public class BooksService {
     private final BooksRepository booksRepository;
     private final CoverRepository coverRepository;
@@ -49,20 +49,34 @@ public class BooksService {
         this.mailingService = mailingService;
     }
 
-    @GetMapping("/allBooks")
+    @GetMapping("/public/allBooks")
     public List<Book> getAllBooks() {
         return Lists.newArrayList(booksRepository.findAll());
+    }
+
+    @GetMapping("/public/getBook/{id}")
+    public ResponseEntity<Book> getBook(@PathVariable("id") Long id) {
+        return ResponseEntity.of(booksRepository.findById(id));
+    }
+
+    @GetMapping(value = "/public/getCover/{id}")
+    public ResponseEntity<byte[]> getCover(@PathVariable("id") Long coverId) {
+        Optional<Cover> optionalCover = coverRepository.findById(coverId);
+        if (!optionalCover.isPresent()){
+            return ResponseEntity.notFound().build();
+        }
+        Cover cover = optionalCover.get();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.valueOf(cover.getMediaType()));
+        headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+
+        return new ResponseEntity<>(cover.getData(), headers, HttpStatus.OK);
     }
 
     @GetMapping("/myBooks")
     public List<Book> getMyBooks(Principal principal) {
         String currentUser = principal.getName();
         return Lists.newArrayList(booksRepository.findByOwner(currentUser));
-    }
-
-    @GetMapping("/getBook/{id}")
-    public ResponseEntity<Book> getAllBooks(@PathVariable("id") Long id) {
-        return ResponseEntity.of(booksRepository.findById(id));
     }
 
     @GetMapping("/askForBook/{id}")
@@ -76,7 +90,7 @@ public class BooksService {
         userInteraction.setFromUser(principal.getName());
         userInteraction.setToUser(book.getHolder());
         userInteraction.setBook(book);
-        userInteraction.setActive(true);
+        userInteraction.setState(InteractionState.NEW);
         userInteraction = userInteractionRepository.save(userInteraction);
 //        mailingService.sendBookReqest(book.getHolder(),
 //                principal.getName(),
@@ -90,7 +104,9 @@ public class BooksService {
         return userInteractionRepository
                 .findByFromUser(principal.getName())
                 .stream()
-                .filter(UserInteraction::isActive)
+                .filter(inter -> inter.getState() != InteractionState.CLOSED
+                        && inter.getState() != InteractionState.SUCCESS
+                        && inter.getState() != InteractionState.CANCELLED)
                 .collect(Collectors.toList());
     }
 
@@ -99,18 +115,43 @@ public class BooksService {
         return userInteractionRepository
                 .findByToUser(principal.getName())
                 .stream()
-                .filter(UserInteraction::isActive)
+                .filter(inter -> inter.getState() == InteractionState.NEW)
                 .collect(Collectors.toList());
     }
 
     @PostMapping("/cancelInteraction")
-    public ResponseEntity<UserInteraction> cancelInteraction(@RequestParam("id") long interactionId, Principal principal) {
+    public ResponseEntity<UserInteraction> cancelInteraction(@RequestParam("id") long interactionId) {
+        return setInteractionsState(interactionId, InteractionState.NEW, InteractionState.CANCELLED);
+    }
+
+    @PostMapping("/successInteraction")
+    public ResponseEntity<UserInteraction> successInteraction(@RequestParam("id") long interactionId) {
+        return setInteractionsState(interactionId, InteractionState.NEW, InteractionState.SUCCESS);
+    }
+
+    @PostMapping("/rejectInteraction")
+    public ResponseEntity<UserInteraction> rejectInteraction(@RequestParam("id") long interactionId) {
+        return setInteractionsState(interactionId, InteractionState.NEW, InteractionState.REJECTED);
+    }
+
+    @PostMapping("/closeInteraction")
+    public ResponseEntity<UserInteraction> closeInteraction(@RequestParam("id") long interactionId) {
+        return setInteractionsState(interactionId, InteractionState.REJECTED, InteractionState.CLOSED);
+    }
+
+    private ResponseEntity<UserInteraction> setInteractionsState(long interactionId,
+                                                                 InteractionState expected,
+                                                                 InteractionState state) {
         Optional<UserInteraction> optionalUserInteraction = userInteractionRepository.findById(interactionId);
-        if (!optionalUserInteraction.isPresent()){
+        if (!optionalUserInteraction.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         UserInteraction userInteraction = optionalUserInteraction.get();
-        userInteraction.setActive(false);
+        if (userInteraction.getState() != expected){
+            throw new IllegalStateException("Expected interation with state " + expected + ", got " + userInteraction.getState());
+        }
+        userInteraction.setState(state);
+        userInteractionRepository.save(userInteraction);
         return ResponseEntity.ok(userInteraction);
     }
 
@@ -131,19 +172,5 @@ public class BooksService {
         cover.setMediaType(data.getContentType());
         Cover save = coverRepository.save(cover);
         return save.getId();
-    }
-
-    @GetMapping(value = "/getCover/{id}")
-    public ResponseEntity<byte[]> getCover(@PathVariable("id") Long coverId) {
-        Optional<Cover> optionalCover = coverRepository.findById(coverId);
-        if (!optionalCover.isPresent()){
-            return ResponseEntity.notFound().build();
-        }
-        Cover cover = optionalCover.get();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.valueOf(cover.getMediaType()));
-        headers.setCacheControl(CacheControl.noCache().getHeaderValue());
-
-        return new ResponseEntity<>(cover.getData(), headers, HttpStatus.OK);
     }
 }

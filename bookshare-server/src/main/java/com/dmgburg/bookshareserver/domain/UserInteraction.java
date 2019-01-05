@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,9 +39,9 @@ public class UserInteraction {
     @JsonProperty("book")
     private Book book;
 
-    @Column(name = "active")
-    @JsonIgnore
-    private boolean active;
+    @Column(name = "state")
+    @JsonProperty("state")
+    private InteractionState state;
 
     @Override
     public String toString() {
@@ -94,11 +93,11 @@ public class UserInteraction {
         this.book = book;
     }
 
-    public boolean isActive() {
-        return active;
+    public InteractionState getState() {
+        return state;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setState(InteractionState state) {
+        this.state = state;
     }
 }

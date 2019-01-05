@@ -30,7 +30,7 @@ export default class Login extends React.Component {
         const { email, password } = this.state;
         const axios = this.context.axios;
         try {
-           const salt = await axios.post('/userSalt', { email: email });
+           const salt = await axios.post('/api/user/public/userSalt', { email: email });
            var hash = crypto.createHmac('sha512', salt.data); /** Hashing algorithm sha512 */
            hash.update(password);
            var value = hash.digest('hex');

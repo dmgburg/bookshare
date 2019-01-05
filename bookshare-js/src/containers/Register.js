@@ -52,8 +52,8 @@ export default class Register extends React.Component {
            hash.update(password);
            var value = hash.digest('hex');
 
-           const response = await this.context.axios.post('/createUser', { email: email, passwordHash: value, passwordSalt: salt });
-           console.log(response);
+           const response = await this.context.axios.post('/api/user/public/createUser', { email: email, passwordHash: value, passwordSalt: salt });
+           const history = this.props.history.push("/")
         } catch (err) {
            console.log(err);
         }
