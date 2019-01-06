@@ -76,6 +76,7 @@ public class UserService implements UserDetailsService {
             Transaction transaction = session.beginTransaction();
 //            String confirmationHash = generateConfirmationHash(50);
 //            user.setConfirmationPending(confirmationHash);
+            user.setEmail(user.getEmail().toLowerCase());
             session.persist(user);
             session.flush();
             transaction.commit();
@@ -92,7 +93,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email.toLowerCase());
         if (user == null) {
             throw new UsernameNotFoundException(email + " not found");
         }

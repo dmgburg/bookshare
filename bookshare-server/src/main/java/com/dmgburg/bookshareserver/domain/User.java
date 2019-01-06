@@ -109,4 +109,8 @@ public class User implements UserDetails {
     public void setConfirmationPendingSentAt(Long confirmationPendingSentAt) {
         this.confirmationPendingSentAt = confirmationPendingSentAt;
     }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

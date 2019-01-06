@@ -53,8 +53,10 @@ export default class Register extends React.Component {
            var value = hash.digest('hex');
 
            const response = await this.context.axios.post('/api/user/public/createUser', { email: email, passwordHash: value, passwordSalt: salt });
-           const history = this.props.history.push("/")
+           this.context.setAlert("Успешно, пожалуйста залогиньтесь")
+           const history = this.props.history.push("/signin")
         } catch (err) {
+           this.context.setAlert("Что-то пошло не так")
            console.log(err);
         }
     }

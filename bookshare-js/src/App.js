@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import LoginWithRouter from "./containers/Login";
 import RegisterWithRouter from "./containers/Register";
 import Header from "./containers/Header";
+import AlertArea from "./containers/AlertArea";
 import Books from "./containers/Books";
 import BookDetailsWithRouter from "./containers/BookDetails";
 import InteractionsWithRouter from "./containers/Interactions";
@@ -30,21 +31,25 @@ class App extends Component {
     instance.get("/api/user/public/currentUser").then((responce) => {
         this.setState( {
           init: true,
+          alert: null,
           email: responce.data,
           axios: instance,
           setEmail: this.setEmail,
+          setAlert: this.setAlert,
         });
     })
 
     this.state = {
       init: false,
       email: "",
+      alert: null,
       axios: instance,
       setEmail: this.setEmail,
     };
 
     this.loadAllBooks = this.loadAllBooks.bind(this);
     this.loadMyBooks = this.loadMyBooks.bind(this);
+    this.setAlert = this.setAlert.bind(this);
   }
 
   async loadAllBooks() {
@@ -58,6 +63,12 @@ class App extends Component {
       return response.data
   }
 
+  setAlert(alert){
+    this.setState({
+        alert: alert
+    })
+  }
+
   render() {
     if(!this.state.init){
         return (<div>loading</div>)
@@ -67,6 +78,7 @@ class App extends Component {
            <div>
            <UserContext.Provider value={this.state}>
             <Header />
+            <AlertArea alert={this.state.alert} setAlert={this.setAlert}/>
                 <div className="container mt-2">
                    <Route path="/books"   render={(props) => <Books {...props} loadData={this.loadAllBooks} />} />
                    <Route path="/myBooks"   render={(props) => <Books {...props} loadData={this.loadMyBooks} />} />
