@@ -56,8 +56,7 @@ export default class Register extends React.Component {
            this.context.setAlert("Успешно, пожалуйста залогиньтесь")
            const history = this.props.history.push("/signin")
         } catch (err) {
-           this.context.setAlert("Что-то пошло не так")
-           console.log(err);
+           this.context.setAlert(err.response.data.message ? err.response.data.message: "Что-то пошло не так")
         }
     }
 
