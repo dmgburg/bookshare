@@ -2,12 +2,11 @@ package com.dmgburg.bookshareserver;
 
 import com.dmgburg.bookshareserver.domain.Book;
 import com.dmgburg.bookshareserver.domain.Cover;
-import com.dmgburg.bookshareserver.domain.InteractionState;
-import com.dmgburg.bookshareserver.domain.UserInteraction;
+import com.dmgburg.bookshareserver.domain.Notification;
 import com.dmgburg.bookshareserver.repository.BooksRepository;
 import com.dmgburg.bookshareserver.repository.CoverRepository;
-import com.dmgburg.bookshareserver.repository.UserInteractionRepository;
-import com.google.common.collect.Collections2;
+import com.dmgburg.bookshareserver.repository.NotificationRepository;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -27,15 +26,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.dmgburg.bookshareserver.domain.InteractionState.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000")
 @RestController
@@ -43,16 +39,16 @@ import static com.dmgburg.bookshareserver.domain.InteractionState.*;
 public class BooksService {
     private final BooksRepository booksRepository;
     private final CoverRepository coverRepository;
-    private final UserInteractionRepository userInteractionRepository;
+    private final NotificationRepository notificationRepository;
     private final MailingService mailingService;
 
     public BooksService(BooksRepository booksRepository,
                         CoverRepository coverRepository,
-                        UserInteractionRepository userInteractionRepository,
+                        NotificationRepository notificationRepository,
                         MailingService mailingService) {
         this.booksRepository = booksRepository;
         this.coverRepository = coverRepository;
-        this.userInteractionRepository = userInteractionRepository;
+        this.notificationRepository = notificationRepository;
         this.mailingService = mailingService;
     }
 
@@ -69,7 +65,7 @@ public class BooksService {
     @GetMapping(value = "/public/getCover/{id}")
     public ResponseEntity<byte[]> getCover(@PathVariable("id") Long coverId) {
         Optional<Cover> optionalCover = coverRepository.findById(coverId);
-        if (!optionalCover.isPresent()){
+        if (!optionalCover.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         Cover cover = optionalCover.get();
@@ -83,88 +79,118 @@ public class BooksService {
     @GetMapping("/myBooks")
     public List<Book> getMyBooks(Principal principal) {
         String currentUser = principal.getName();
-        return Lists.newArrayList(booksRepository.findByOwner(currentUser));
+        Stream<Book> byOwner = booksRepository.findByOwner(currentUser).stream();
+        Stream<Book> booksWithNotifications = StreamSupport.stream(
+                booksRepository.findAllById(notificationRepository
+                        .findByToUser(principal.getName())
+                        .stream()
+                        .map(Notification::getBook)
+                        .collect(Collectors.toList()))
+                        .spliterator(), false);
+        return Stream.concat(byOwner, booksWithNotifications)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
-    @GetMapping("/askForBook/{id}")
+    @GetMapping("/addToQueue/{id}")
     public ResponseEntity<Long> askForBook(@PathVariable("id") Long id, Principal principal) throws IOException {
         Optional<Book> optionalBook = booksRepository.findById(id);
-        if (!optionalBook.isPresent()){
+        if (!optionalBook.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         Book book = optionalBook.get();
-        UserInteraction userInteraction = new UserInteraction();
-        userInteraction.setFromUser(principal.getName());
-        userInteraction.setToUser(book.getHolder());
-        userInteraction.setBook(book);
-        userInteraction.setState(NEW);
-        userInteraction = userInteractionRepository.save(userInteraction);
-//        mailingService.sendBookReqest(book.getHolder(),
-//                principal.getName(),
-//                principal.getName(),
-//                userInteraction.getId());
-        return ResponseEntity.ok(userInteraction.getId());
+        List<String> userQueue = book.getUserQueue();
+
+        if (userQueue.isEmpty() && book.getNotification() == null) {
+            Notification notification = new Notification()
+                    .setToUser(book.getHolder())
+                    .setFromUser(principal.getName())
+                    .setBook(book.getId())
+                    .setType(Notification.Type.QUEUE_NOT_EMPTY);
+            book.setNotification(notification);
+            notificationRepository.save(notification);
+        } else if (book.getOwner().equals(principal.getName())){
+            Notification notification = new Notification()
+                    .setToUser(book.getHolder())
+                    .setFromUser(principal.getName())
+                    .setBook(book.getId())
+                    .setType(Notification.Type.QUEUE_NOT_EMPTY);
+        }
+        userQueue.add(principal.getName());
+        booksRepository.save(book);
+        return ResponseEntity.ok(0L);
     }
 
-    @GetMapping("/getMyInteractions")
-    public List<UserInteraction> getMyInteractions(Principal principal) {
-        return userInteractionRepository
-                .findByFromUser(principal.getName())
-                .stream()
-                .filter(inter -> inter.getState() != CLOSED
-                        && inter.getState() != CANCELLED)
-                .collect(Collectors.toList());
-    }
-
-    @GetMapping("/getInteractionsToMe")
-    public List<UserInteraction> getInteractionsToMe(Principal principal) {
-        return userInteractionRepository
-                .findByToUser(principal.getName())
-                .stream()
-                .filter(inter -> inter.getState() == NEW)
-                .collect(Collectors.toList());
-    }
-
-    @PostMapping("/cancelInteraction")
-    public ResponseEntity<UserInteraction> cancelInteraction(@RequestParam("id") long interactionId) {
-        return setInteractionsState(interactionId, NEW, CANCELLED);
-    }
-
-    @PostMapping("/successInteraction")
-    public ResponseEntity<UserInteraction> successInteraction(@RequestParam("id") long interactionId) {
-        return setInteractionsState(interactionId, NEW, SUCCESS);
-    }
-
-    @PostMapping("/rejectInteraction")
-    public ResponseEntity<UserInteraction> rejectInteraction(@RequestParam("id") long interactionId) {
-        return setInteractionsState(interactionId, NEW, REJECTED);
-    }
-
-    @PostMapping("/closeInteraction")
-    public ResponseEntity<UserInteraction> closeInteraction(@RequestParam("id") long interactionId) {
-        return setInteractionsState(interactionId, Arrays.asList(REJECTED, SUCCESS), CLOSED);
-    }
-
-    private ResponseEntity<UserInteraction> setInteractionsState(long interactionId,
-                                                                 InteractionState expected,
-                                                                 InteractionState state) {
-        return setInteractionsState(interactionId, Collections.singleton(expected), state);
-    }
-
-    private ResponseEntity<UserInteraction> setInteractionsState(long interactionId,
-                                                                 Collection<InteractionState> expected,
-                                                                 InteractionState state) {
-        Optional<UserInteraction> optionalUserInteraction = userInteractionRepository.findById(interactionId);
-        if (!optionalUserInteraction.isPresent()) {
+    @GetMapping("/confirmHandover/{id}")
+    public ResponseEntity<String> confirmHandover(@PathVariable("id") Long id, Principal principal) throws IOException {
+        Optional<Book> optionalBook = booksRepository.findById(id);
+        if (!optionalBook.isPresent()) {
             return ResponseEntity.notFound().build();
         }
-        UserInteraction userInteraction = optionalUserInteraction.get();
-        if (!expected.contains(userInteraction.getState())){
-            throw new IllegalStateException("Expected interation with state " + expected + ", got " + userInteraction.getState());
+        Book book = optionalBook.get();
+
+        Notification notification = book.getNotification();
+        if (!notification.getToUser().equals(principal.getName())){
+            return ResponseEntity.badRequest().body("Книга предназанчалась кому-то другому. Попросите админа сайта разобраться");
         }
-        userInteraction.setState(state);
-        userInteractionRepository.save(userInteraction);
-        return ResponseEntity.ok(userInteraction);
+        book = book.setNotification(null).setHolder(principal.getName());
+        booksRepository.save(book);
+        notificationRepository.delete(notification);
+        return ResponseEntity.ok("");
+    }
+
+    @GetMapping("/handoverBook/{id}")
+    public ResponseEntity<Long> handoverBook(@PathVariable("id") Long id, Principal principal) throws IOException {
+        Optional<Book> optionalBook = booksRepository.findById(id);
+        if (!optionalBook.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        Book book = optionalBook.get();
+
+        Preconditions.checkArgument(book.getHolder().equals(principal.getName()));
+
+        List<String> userQueue = book.getUserQueue();
+        Notification notification = new Notification()
+                .setFromUser(principal.getName())
+                .setBook(book.getId())
+                .setType(Notification.Type.BOOK_IS_WAITING)
+                .setToUser(userQueue.isEmpty() ? book.getOwner() : book.getUserQueue().get(0));
+        book.setNotification(notification);
+        notificationRepository.save(notification);
+        booksRepository.save(book);
+        return ResponseEntity.ok(0L);
+    }
+
+    @GetMapping("/removeFromQueue/{id}")
+    public ResponseEntity<Long> removeFromQueue(@PathVariable("id") Long id, Principal principal) throws IOException {
+        Optional<Book> optionalBook = booksRepository.findById(id);
+        if (!optionalBook.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        Book book = optionalBook.get();
+        book.getUserQueue().remove(principal.getName());
+        if(book.getUserQueue().isEmpty()){
+            book.setNotification(null);
+        } else {
+            Notification notification = new Notification()
+                    .setFromUser(book.getUserQueue().get(0))
+                    .setToUser(book.getHolder())
+                    .setBook(book.getId())
+                    .setType(Notification.Type.QUEUE_NOT_EMPTY);
+            notificationRepository.findByToUser(principal.getName())
+                    .stream()
+                    .filter(it -> it.getBook() == book.getId())
+                    .forEach(notificationRepository::delete);
+            notificationRepository.save(notification);
+            book.setNotification(notification);
+        }
+        booksRepository.save(book);
+        return ResponseEntity.ok(0L);
+    }
+
+    @GetMapping("/notifications")
+    public List<Notification> getNotifications(Principal principal) {
+        return Collections.emptyList();
     }
 
     @PostMapping("/addBook")

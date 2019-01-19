@@ -43,7 +43,7 @@ export default class Login extends React.Component {
            console.log(JSON.stringify(response));
            this.context.setEmail(response.data)
         } catch (err) {
-           console.log(err);
+           this.context.setAlert(err)
         }
     }
 

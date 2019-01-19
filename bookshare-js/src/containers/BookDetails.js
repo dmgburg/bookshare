@@ -1,5 +1,6 @@
 import React from 'react';
 import { UserContext } from "../UserContext";
+import BookQueue from "./BookQueue";
 import { withRouter } from "react-router";
 
 export default class BookDetails extends React.Component {
@@ -9,21 +10,29 @@ export default class BookDetails extends React.Component {
             book: {}
         }
         this.askForBook = this.askForBook.bind(this)
+        this.handoverBook = this.handoverBook.bind(this)
+        this.removeFromQueue = this.removeFromQueue.bind(this)
     }
 
     async askForBook(){
         const axios = this.context.axios;
-        const response = await axios.get("/api/book/askForBook/" + this.state.book.id)
+        const response = await axios.get("/api/book/addToQueue/" + this.state.book.id)
         console.log(response.data)
-        this.props.history.push("/interactions")
+        this.fetchState()
     }
 
-    async returnBook(){
+    async handoverBook(){
         const axios = this.context.axios;
-
-        const response = await axios.get("/api/book/returnBook/" + this.state.book.id)
+        const response = await axios.get("/api/book/handoverBook/" + this.state.book.id)
         console.log(response.data)
-        this.props.history.push("/interactions")
+        this.fetchState()
+    }
+
+    async removeFromQueue(){
+        const axios = this.context.axios;
+        const response = await axios.get("/api/book/removeFromQueue/" + this.state.book.id)
+        console.log(response.data)
+        this.fetchState()
     }
 
     componentWillMount() {
@@ -65,10 +74,10 @@ export default class BookDetails extends React.Component {
                           <div className="col-sm-3 font-weight-bold">Сейчас книга у</div>
                           <div className="col-sm-9">{this.state.book.holder}</div>
                         </div>
-                        <RequestButton
-                            email={this.context.email}
-                            book={this.state.book}
-                            askForBook={this.askForBook} />
+                        <BookQueue book={this.state.book}
+                            askForBook={this.askForBook}
+                            handoverBook={this.handoverBook}
+                            removeFromQueue={this.removeFromQueue}/>
                     </div>
                 </div>
                 <h3 className="row mx-0">О книге</h3>
@@ -81,18 +90,3 @@ export default class BookDetails extends React.Component {
 }
 BookDetails.contextType = UserContext;
 export const BookDetailsWithRouter = withRouter(BookDetails);
-
-class RequestButton extends React.Component{
-    render() {
-        if(!this.props.email){
-            return null
-        }
-        if (this.props.email === this.props.book.holder && this.props.email !== this.props.book.holder){
-            return (<div className="btn btn-success mt-2" onClick={this.props.askForBook}>Вернуть книгу</div>)
-        }
-        if (this.props.email === this.props.book.holder && this.props.email === this.props.book.owner){
-            return (<div className="btn btn-success mt-2 disabled">Это ваша книга</div>)
-        }
-        return (<div className="btn btn-success mt-2" onClick={this.props.askForBook}>Попросить книгу</div>)
-    }
-}

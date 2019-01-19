@@ -20,7 +20,7 @@ class UserBooksBar  extends React.Component {
         this.handleClick = this.handleClick.bind(this)
 
         this.state = {
-            requestsToMe: 0
+            notifications: 0
         }
     }
 
@@ -39,9 +39,9 @@ class UserBooksBar  extends React.Component {
     }
 
     componentDidMount(){
-        this.context.axios.get("/api/book/getInteractionsToMe").then((resp) =>{
+        this.context.axios.get("/api/book/notifications").then((resp) =>{
             this.setState({
-                requestsToMe: resp.data.length,
+                notifications: resp.data.length,
             })
         })
     }
@@ -59,9 +59,9 @@ class UserBooksBar  extends React.Component {
                     <Link className="nav-link" to="/addBook">Добавить книгу</Link>
                 </li>
                 <li className="nav-item active">
-                    <Link className="nav-link" to="/interactions">Запросы
-                        {this.state.requestsToMe ?
-                            <span className="badge badge-success ml-1">{this.state.requestsToMe}</span> :
+                    <Link className="nav-link" to="/notifications">Уведомления
+                        {this.state.notifications ?
+                            <span className="badge badge-success ml-1">{this.state.notifications}</span> :
                             null}
                     </Link>
                 </li>

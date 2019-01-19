@@ -8,7 +8,7 @@ import Header from "./containers/Header";
 import AlertArea from "./containers/AlertArea";
 import Books from "./containers/Books";
 import BookDetailsWithRouter from "./containers/BookDetails";
-import InteractionsWithRouter from "./containers/Interactions";
+import NotificationsWithRouter from "./containers/Notifications";
 import AddBookWithRouter from "./containers/AddBook";
 import { UserContext } from "./UserContext";
 import { BrowserRouter as Router, Route } from "react-router-dom";
@@ -24,7 +24,7 @@ class App extends Component {
     };
 
     const instance = axios.create({
-//      baseURL: 'http://localhost:8080/',
+      baseURL: 'http://localhost:8080/',
       withCredentials: true,
     })
 
@@ -63,7 +63,14 @@ class App extends Component {
       return response.data
   }
 
-  setAlert(alert){
+  setAlert(err){
+    let alert = "Что-то пошло не так"
+    if(!err){
+        alert = null
+    }
+    if(err && err.response && err.response.data && err.response.data.message){
+        alert = err.response.data.message
+    }
     this.setState({
         alert: alert
     })
@@ -80,12 +87,12 @@ class App extends Component {
             <Header />
             <AlertArea alert={this.state.alert} setAlert={this.setAlert}/>
                 <div className="container mt-2">
-                   <Route path="/books"   render={(props) => <Books {...props} loadData={this.loadAllBooks} />} />
+                   <Route path="/books"   render={(props) => <Books {...props} loadData={this.loadAllBooks} actionsHidden={true}/>} />
                    <Route path="/myBooks"   render={(props) => <Books {...props} loadData={this.loadMyBooks} />} />
                    <Route path="/addBook" component={AddBookWithRouter} />
                    <Route path="/signin" component={LoginWithRouter} />
                    <Route path="/signup" component={RegisterWithRouter} />
-                   <Route path="/interactions" component={InteractionsWithRouter} />
+                   <Route path="/notifications" component={NotificationsWithRouter} />
                    <Route path="/bookDetails/:id" component={BookDetailsWithRouter} />
                 </div>
             </UserContext.Provider>

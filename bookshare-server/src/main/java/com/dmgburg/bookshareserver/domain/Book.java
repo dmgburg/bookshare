@@ -4,12 +4,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Book {
@@ -45,6 +51,15 @@ public class Book {
     @JsonProperty("coverId")
     private String coverId;
 
+    @JsonProperty("queue")
+    @ElementCollection
+    private List<String> userQueue;
+
+    @OneToOne
+    @JoinColumn(name = "NOTIFICATION_ID")
+    @JsonProperty("notification")
+    private Notification notification;
+
     @Override
     public String toString() {
         return "Book{" +
@@ -63,8 +78,9 @@ public class Book {
         this.owner = owner;
     }
 
-    public void setHolder(String holder) {
+    public Book setHolder(String holder) {
         this.holder = holder;
+        return this;
     }
 
     public String getOwner() {
@@ -73,5 +89,24 @@ public class Book {
 
     public String getHolder() {
         return holder;
+    }
+
+    public Notification getNotification() {
+        return notification;
+    }
+
+    public Book setNotification(Notification notification) {
+        this.notification = notification;
+        if (notification != null) {
+            notification.setBook(this.getId());
+        }
+        return this;
+    }
+
+    public List<String> getUserQueue() {
+        if (userQueue == null){
+            userQueue = new ArrayList<>();
+        }
+        return userQueue;
     }
 }
