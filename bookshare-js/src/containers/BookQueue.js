@@ -1,6 +1,5 @@
 import React from 'react';
 import { UserContext } from "../UserContext";
-import { withRouter } from "react-router";
 
 export default class BookQueue extends React.Component{
     list(queue){

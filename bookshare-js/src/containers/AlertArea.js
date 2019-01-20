@@ -1,6 +1,4 @@
 import React from 'react';
-import { UserContext } from "../UserContext";
-import { withRouter } from "react-router";
 
 export default class AlertArea extends React.Component {
     constructor(props){

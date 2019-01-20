@@ -53,17 +53,12 @@ class UserBooksBar  extends React.Component {
                     <Link className="nav-link" to="/books">Книги</Link>
                 </li>
                 <li className="nav-item active">
-                    <Link className="nav-link" to="/myBooks">Мои книги</Link>
+                    <Link className="nav-link" to="/myBooks">Мои книги
+                        {this.state.notifications ? <span className="badge badge-success ml-1">{this.state.notifications}</span> : null}
+                    </Link>
                 </li>
                 <li className="nav-item active">
                     <Link className="nav-link" to="/addBook">Добавить книгу</Link>
-                </li>
-                <li className="nav-item active">
-                    <Link className="nav-link" to="/notifications">Уведомления
-                        {this.state.notifications ?
-                            <span className="badge badge-success ml-1">{this.state.notifications}</span> :
-                            null}
-                    </Link>
                 </li>
             </ul>
         )

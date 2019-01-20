@@ -8,7 +8,6 @@ import Header from "./containers/Header";
 import AlertArea from "./containers/AlertArea";
 import Books from "./containers/Books";
 import BookDetailsWithRouter from "./containers/BookDetails";
-import NotificationsWithRouter from "./containers/Notifications";
 import AddBookWithRouter from "./containers/AddBook";
 import { UserContext } from "./UserContext";
 import { BrowserRouter as Router, Route } from "react-router-dom";
@@ -92,7 +91,6 @@ class App extends Component {
                    <Route path="/addBook" component={AddBookWithRouter} />
                    <Route path="/signin" component={LoginWithRouter} />
                    <Route path="/signup" component={RegisterWithRouter} />
-                   <Route path="/notifications" component={NotificationsWithRouter} />
                    <Route path="/bookDetails/:id" component={BookDetailsWithRouter} />
                 </div>
             </UserContext.Provider>
