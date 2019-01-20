@@ -95,6 +95,14 @@ public class Book {
         return notification;
     }
 
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
     public Book setNotification(Notification notification) {
         this.notification = notification;
         if (notification != null) {

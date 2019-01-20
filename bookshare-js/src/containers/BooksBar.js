@@ -60,6 +60,9 @@ class UserBooksBar  extends React.Component {
                 <li className="nav-item active">
                     <Link className="nav-link" to="/addBook">Добавить книгу</Link>
                 </li>
+                <li className="nav-item active">
+                    <Link className="nav-link" to="/search">Поиск</Link>
+                </li>
             </ul>
         )
     }

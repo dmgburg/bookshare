@@ -7,6 +7,7 @@ import RegisterWithRouter from "./containers/Register";
 import Header from "./containers/Header";
 import AlertArea from "./containers/AlertArea";
 import Books from "./containers/Books";
+import {Search} from "./containers/Search";
 import BookDetailsWithRouter from "./containers/BookDetails";
 import AddBookWithRouter from "./containers/AddBook";
 import { UserContext } from "./UserContext";
@@ -91,6 +92,7 @@ class App extends Component {
                    <Route path="/addBook" component={AddBookWithRouter} />
                    <Route path="/signin" component={LoginWithRouter} />
                    <Route path="/signup" component={RegisterWithRouter} />
+                   <Route path="/search" component={Search} />
                    <Route path="/bookDetails/:id" component={BookDetailsWithRouter} />
                 </div>
             </UserContext.Provider>
