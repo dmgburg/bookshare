@@ -1,15 +1,16 @@
 import React from 'react';
 import { UserContext } from "../UserContext";
 import { withRouter } from "react-router";
+import Cookies from 'universal-cookie';
 
 export default class AddBook extends React.Component {
 
     constructor(props) {
       super(props);
 
-      this.state = {
-        book: {},
-      };
+      const cookies = new Cookies();
+      const state = cookies.get('addBookDraft');
+      this.state = state;
 
       this.handleChange = this.handleChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
@@ -19,14 +20,19 @@ export default class AddBook extends React.Component {
        const target = event.target;
        const value = target.value;
        const name = target.name;
-       this.setState((state) => {
-           const prevBook = state.book
-           prevBook[name] = value
-           return {
-             [name]: value,
-             book: prevBook
+
+       this.setState(
+           (state) => {
+               const prevBook = state.book
+               prevBook[name] = value
+               return {
+                 [name]: value,
+                 book: prevBook
+               }
+           }, function() {
+                const cookies = new Cookies();
+                cookies.set('addBookDraft', JSON.stringify(this.state));
            }
-       }
        );
     }
 
@@ -41,6 +47,8 @@ export default class AddBook extends React.Component {
           book.coverId = coverId.data
           const bookId = await axios.post('/api/book/addBook', book );
           console.log(bookId);
+          const cookies = new Cookies();
+          cookies.set('addBookDraft', null);
           this.props.history.push("/bookDetails/" + bookId.data)
        } catch (err) {
           console.log(err);
@@ -52,6 +60,9 @@ export default class AddBook extends React.Component {
         this.setState({
           imageURL: URL.createObjectURL(event.target.files[0]),
           image: event.target.files[0]
+        }, function() {
+             const cookies = new Cookies();
+             cookies.set('addBookDraft', JSON.stringify(this.state));
         });
       }
     }
