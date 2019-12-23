@@ -29,7 +29,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-@CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/user")
 public class UserService implements UserDetailsService {

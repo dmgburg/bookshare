@@ -9,7 +9,8 @@ export default class AddBook extends React.Component {
       super(props);
 
       const cookies = new Cookies();
-      const state = cookies.get('addBookDraft');
+      const state = cookies.get('addBookDraft') ? cookies.get('addBookDraft') : {book: {}} ;
+
       this.state = state;
 
       this.handleChange = this.handleChange.bind(this);
@@ -89,6 +90,7 @@ export default class AddBook extends React.Component {
 
 //    TODO: adjust inputs left and right
     render() {
+    let book = this.state.book || {}
         return (
             <div className="container mt-3">
                 <form onSubmit={this.handleSubmit}>
@@ -108,7 +110,7 @@ export default class AddBook extends React.Component {
                                      name="name"
                                      placeholder="Название"
                                      autoComplete="off"
-                                     value={this.state.book.name}
+                                     value={book.name}
                                      onChange={this.handleChange}/>
                             </div>
                             <div className="form-group col-sm-12 row mx-0">
@@ -117,7 +119,7 @@ export default class AddBook extends React.Component {
                                      name="author"
                                      placeholder="Автор"
                                      autoComplete="off"
-                                     value={this.state.book.author}
+                                     value={book.author}
                                      onChange={this.handleChange}/>
                             </div>
                             <div className="form-group col-sm-12 row mx-0">
@@ -128,7 +130,7 @@ export default class AddBook extends React.Component {
                                      autoComplete="off"
                                      rows={7}
                                      ref={c => (this.textarea = c)}
-                                     value={this.state.book.description}
+                                     value={book.description}
                                      onChange={this.handleChange}/>
                             </div>
                         </div>

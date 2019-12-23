@@ -5,8 +5,8 @@
   "dependencies": {
     "ag-grid-community": "^19.1.4",
     "ag-grid-react": "^19.1.2",
-    "axios": "^0.18.0",
-    "bootstrap": "^4.2.1",
+    "axios": "^0.18.1",
+    "bootstrap": "^4.4.1",
     "crypto": "^1.0.1",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
@@ -33,5 +33,6 @@
   "devDependencies": {
     "react-app-rewire-build-dev": "^1.0.1",
     "react-app-rewired": "^1.6.2"
-  }
+  },
+  "proxy": "http://localhost:8080"
 }
