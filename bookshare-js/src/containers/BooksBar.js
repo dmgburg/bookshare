@@ -76,6 +76,9 @@ class GuestBooksBar  extends React.Component {
             <li className="nav-item active">
                 <Link className="nav-link" to="/books">Книги</Link>
             </li>
+            <li className="nav-item active">
+                <Link className="nav-link" to="/search">Поиск</Link>
+            </li>
         </ul>
     )
   }

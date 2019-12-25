@@ -18,7 +18,7 @@ export class Search extends React.Component {
       var params = new URLSearchParams();
       params.append('searchString', searchString);
       const axios = this.context.axios;
-      const my = await axios.post("/api/search/author", params);
+      const my = await axios.post("/public/api/search/author", params);
       this.setState({
           books: my.data,
           lastSearch: searchString

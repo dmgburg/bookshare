@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/search")
+@RequestMapping("/public/api/search")
 public class SearchService {
 
     private final BooksRepository booksRepository;

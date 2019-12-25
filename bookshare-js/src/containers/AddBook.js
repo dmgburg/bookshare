@@ -24,7 +24,7 @@ export default class AddBook extends React.Component {
 
        this.setState(
            (state) => {
-               const prevBook = state.book
+               const prevBook = state.book || {}
                prevBook[name] = value
                return {
                  [name]: value,

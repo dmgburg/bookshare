@@ -91,6 +91,8 @@ export default class Books extends React.Component {
                 rowData={this.state.rowData}
                 domLayout="autoHeight"
                 enableColResize={true}
+                pagination={true}
+                paginationPageSize={3}
                 rowSelection={"single"}
                 context={{
                     componentParent: this,
