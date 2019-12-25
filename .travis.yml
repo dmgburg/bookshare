@@ -1,1 +1,7 @@
 language: java
+
+env:
+  global:
+    secure: cUvdJ50RYix0G/ZX/DThU/IKG/E51JW23j8/lNhBfCFePtb0ZskhSQxnSKyBfFpQyeUDLl5SfCHJeT+edfN1JZB6cOKJevyFSk5b6o6lKLj0ODNRPlRSTB5JYgvmxFLyreMqTgVF28fiataPbXJX+kbLSg7he7sgvciy1s+gp/X4xyiD+63QFdqr+roVyxlDWRxRRwsKip48GEF1GGtWd5iZqf6xDFDJ6j3hcyYhC1zpQm3mlxtdoudHpCaH7+n4TDFm59WnzDcMu+IwKcNV+j6lL3OOV1aBfD278GbCFcz5aGHtELTLpIHhHGoGaCj0UOB1Kc75yaLI8A02nvy2H3iIqm3zUCCzvG9lLxay3yWgY8TVYYvs91Dl8Mxy5QAwm+cYLrQ3czHvlJsM5CW1280xG4tlY6/A+gbD02sEhPYYM6KmmI3RkD6StlkcXzarjJ/K5vhrGpurQLNv4Gl0WWe01WHfkps+qS9Bwmmpw3fAN30ET9wuOP1Rdwo6Zlv+7DvfETdltpf/YoPE5pk/FmxdkU3NdlAsjwwUKtZuYvoER/qRPQ2GFRejJryD+vjhAl/V2tXJkHHAY6sWMISohjKV0BK8GfTom99/x+TK2JLR6Eb1KyJfstEyM8RfE3OG+yMgrFeE9XBge3hm+FtGTmoN94MU5QWIf6zvuipX+uc=
+after_success:
+  - echo "${ururu}"
