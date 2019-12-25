@@ -80,7 +80,6 @@ class SearchBar extends React.Component {
   }
 
   render() {
-      let user = this.context.email
       return (
           <form onSubmit={this.handleSubmit}>
               <div className="card-body row no-gutters align-items-center">
