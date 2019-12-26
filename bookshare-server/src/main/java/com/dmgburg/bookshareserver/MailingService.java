@@ -24,9 +24,9 @@ import java.util.Properties;
 public class MailingService {
     private final Session session;
     private final String baseURL;
-    public MailingService(@Value("${dmgburg.mail.baseUrl}") String baseUrl,
-                            @Value("${dmgburg.mail.username}") String username,
-                            @Value("${dmgburg.mail.password}") String password) {
+    public MailingService(@Value("${dmgburg.mail.baseUrl:}") String baseUrl,
+                            @Value("${dmgburg.mail.username:}") String username,
+                            @Value("${dmgburg.mail.password:}") String password) {
         Properties prop = new Properties();
         prop.put("mail.smtp.auth", "true");
         prop.put("mail.smtp.starttls.enable", "true");
