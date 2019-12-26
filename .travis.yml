@@ -1,5 +1,6 @@
 language: java
 after_success:
+- chmod 400 id_rsa_travis
 - scp -i id_rsa_travis -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null bookshare-server/target/bookshare-server-1.0-SNAPSHOT.jar travis@80.211.145.89:/home/travis/bookshare
 before_install:
 - openssl aes-256-cbc -K $encrypted_5325d21e7f69_key -iv $encrypted_5325d21e7f69_iv
