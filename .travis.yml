@@ -1,7 +1,6 @@
 language: java
-env:
-  global:
-  - secure: Y4jnagAV8POjWJ/gUENkzHIq+eQzLmVVy6hkU/ZsahMvJyoPrmwnGirNp3gBm+0uAnEPmvbHi6QvqQR62M/pMrcBnvUB+0cNt/Em+K5mBDxSU1nYZSz/hcukaAXfNJtougKxEdktswmlRzFFu9XA7aG9noaqO5NbN+WqWFxR02M7V3c/khmGeZcz/mJZTjub7W8bmEq0yasRSXvTH9Mmrv7Ohcf7xguStUc9yY6OWnYQdbK7xA2iBiFlqg3ZK2b1Pt5t1cYFf0D/zUFbp9y8GQknwtkgiuF1JaSejhV5or/u+FZ/BajenXJom10AOVX/NwzxiCW5qxNb3ggaLgYdgJyk6/KwvdToNq0kRyY1ne77c/qfbkidZJZmWCFlMIqw/ALcQu5uQcIWRy4iNtzM/YjAMnv9OATLNhGOloA3z8xEnSKbh/REWLqDDr5+LWIhFf2S5GRbPDG+euOwE/gqGbX0RxEA2/4bse4h2iTR2VzcYwuNAJVWBkYo7WjMP+tXBzEemErxT/3ixYAGjF5jUP803RPMAI2VbQ3k5S18mnWp27+ce36kU4LejvsXrWZa/v5IJ3l/zPpYSJFsTFQJezFbZsST8fqe+ce5Cc8YFo5fI5JRXoi/Z5hWrBFdB04n4LtUCYvuavlgKJ8TLrAYj5MZcap4/4jrlh7Nar7A2xE=
-  - secure: p/Fv6Onw/UeZfg344N12Nw5kJMVeMVwADjMGNdj9pnGBCpE5SVVUNw3+MNL+zIOpXht3P7BUXgV2r9tI8nsYwRn2MnmFyA3cVLxAQs0urFBKSeab3pOAKBDdpJsB4zryO2rmYCI7+tpbOBz+GFqud0NfcGgwLzpES8DFcv/1u5JbnyW2+CZy3NHXR32Yurz0N8Fj3Tkj1uAeFPBp7Mzn+NEl7W/I+NLXqRp1E178s59RZgYp6TfsOcBYuXrLl5DvTegBzoln9ityEWBf8ew50foKvIlwdlKNKrPcpchtpYAPBhjDiy3sM4QN2gpfG6w8xoQwuIKq7gUiL5R/g1xNuYftbMkYpicUpQ7TgI4H58js3uogawKoUlj299duTabK7uVBIgkDAVFvJ/iDrwGdPXCqF8c8tkPmQlhQXp39aJG2FOuOiQzspIKdrv9lrbnz+aG27mdUCc+vx/hIhiJvUl9w+CDl0VyAwlseJEGkGGdWs6Sa5xQslah0bXhDKvEAxWFb0x7rfMGOCW1HpZfL76USoZoWnTzphLpyxHNdHb7epTaZZUAtBgyrUpjOlMH9Ycwuo4oc4sy78aPewkafB4E9R1QzVm98+fQ+5/s8PpskCAp2HcLyx+6W1kgjdM+otiDjL28g8WOOddr4zF+hEeyKqQNRBmrMgv1SraaCiSA=
 after_success:
-  - curl -v --insecure -p "sftp://80.211.145.89/~/bookshare/bookshare-server-1.0-SNAPSHOT.jar"  --user "${sftp_user}:${sftp_pass}" -T "bookshare-server/target/bookshare-server-1.0-SNAPSHOT.jar"
+- scp -i ~/.ssh/id_rsa_travis bookshare-server/target/bookshare-server-1.0-SNAPSHOT.jar travis@80.211.145.89:/home/travis/bookshare
+before_install:
+- openssl aes-256-cbc -K $encrypted_5325d21e7f69_key -iv $encrypted_5325d21e7f69_iv
+  -in id_rsa_travis.enc -out ~\/.ssh/id_rsa_travis -d
