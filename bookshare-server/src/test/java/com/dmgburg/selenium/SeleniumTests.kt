@@ -27,13 +27,6 @@ class SeleniumTests {
         val serverUrl : String? = System.getProperty("server.url") ?: "http://localhost:8080"
     }
 
-    @Before
-    fun setup() {
-        if(System.getProperty("webdriver.chrome.driver") == null) {
-            System.setProperty("webdriver.chrome.driver", "C:\\Users\\Denis\\chromedriver.exe")
-        }
-    }
-
     private fun createDriver(): ChromeDriver {
         val options = ChromeOptions()
         options.setHeadless(true)
