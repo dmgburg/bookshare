@@ -30,7 +30,7 @@ class SeleniumTests {
     @Before
     fun setup() {
         if(System.getProperty("webdriver.chrome.driver") == null) {
-            System.setProperty("webdriver.chrome.driver", "google-chrome-stable")
+            System.setProperty("webdriver.chrome.driver", "/usr/bin/google-chrome-stable")
         }
     }
 
