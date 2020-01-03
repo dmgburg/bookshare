@@ -5,7 +5,6 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy
 import org.openqa.selenium.support.PageFactory
-import sun.security.util.Password
 
 class LoginPage(private val driver: WebDriver) {
 
