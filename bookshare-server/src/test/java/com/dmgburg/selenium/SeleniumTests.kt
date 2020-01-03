@@ -29,8 +29,11 @@ class SeleniumTests {
 
     @Before
     fun setup() {
-        if(System.getProperty("webdriver.chrome.driver") == null) {
-            System.setProperty("webdriver.chrome.driver", "/usr/bin/google-chrome-stable")
+//        if(System.getProperty("webdriver.chrome.driver") == null) {
+//            System.setProperty("webdriver.chrome.driver", "/usr/bin/google-chrome-stable")
+//        }
+        if(System.getProperty("webdriver.remote.server") == null) {
+            System.setProperty("webdriver.remote.server", "http://localhost:9222/wd/hub")
         }
     }
 
