@@ -1,6 +1,7 @@
 package com.dmgburg.selenium
 
 import com.dmgburg.bookshareserver.BookshareServerApplication
+import com.dmgburg.findElementByClassName
 import com.dmgburg.getRelative
 import com.dmgburg.randomStr
 import com.dmgburg.waitForClass
@@ -10,6 +11,9 @@ import org.junit.Test
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.remote.DesiredCapabilities
+import org.openqa.selenium.remote.RemoteWebDriver
+import java.net.URL
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
 
@@ -32,15 +36,15 @@ class SeleniumTests {
 //        if(System.getProperty("webdriver.chrome.driver") == null) {
 //            System.setProperty("webdriver.chrome.driver", "/usr/bin/google-chrome-stable")
 //        }
-        if(System.getProperty("webdriver.remote.server") == null) {
-            System.setProperty("webdriver.remote.server", "http://localhost:9222/wd/hub")
-        }
+//        if(System.getProperty("webdriver.remote.server") == null) {
+//            System.setProperty("webdriver.remote.server", "http://localhost:9222/wd/hub")
+//        }
     }
 
-    private fun createDriver(): ChromeDriver {
+    private fun createDriver(): WebDriver {
         val options = ChromeOptions()
         options.setHeadless(true)
-        val driver = ChromeDriver(options)
+        val driver = RemoteWebDriver(URL("http://localhost:9222"), DesiredCapabilities.chrome())
         driver.manage()?.timeouts()?.implicitlyWait(10, TimeUnit.SECONDS)
         driver.get(serverUrl)
         return driver

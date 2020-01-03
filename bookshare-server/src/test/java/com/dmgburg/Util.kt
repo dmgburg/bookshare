@@ -35,3 +35,5 @@ fun WebDriver.waitForClass(classAss: String) {
 }
 
 fun WebDriver.getRelative(url: String) = this.get(URI(this.getCurrentUrl()).resolve(url).toString())
+
+fun WebDriver.findElementByClassName(classname: String) = this.findElement(By.className(classname))
