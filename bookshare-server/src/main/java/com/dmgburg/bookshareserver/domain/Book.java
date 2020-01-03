@@ -1,6 +1,7 @@
 package com.dmgburg.bookshareserver.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Objects;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
@@ -19,6 +20,16 @@ import java.util.List;
 
 @Entity
 public class Book {
+    public Book() {
+    }
+
+    public Book(String name, String description, String author, String coverId) {
+        this.name = name;
+        this.description = description;
+        this.author = author;
+        this.coverId = coverId;
+    }
+
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "book_Sequence")
     @SequenceGenerator(name = "book_Sequence", sequenceName = "BOOK_SEQ")
@@ -78,6 +89,10 @@ public class Book {
         this.owner = owner;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Book setHolder(String holder) {
         this.holder = holder;
         return this;
@@ -116,5 +131,26 @@ public class Book {
             userQueue = new ArrayList<>();
         }
         return userQueue;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return Objects.equal(id, book.id) &&
+                Objects.equal(name, book.name) &&
+                Objects.equal(description, book.description) &&
+                Objects.equal(author, book.author) &&
+                Objects.equal(owner, book.owner) &&
+                Objects.equal(holder, book.holder) &&
+                Objects.equal(coverId, book.coverId) &&
+                Objects.equal(userQueue, book.userQueue) &&
+                Objects.equal(notification, book.notification);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, name, description, author, owner, holder, coverId, userQueue, notification);
     }
 }

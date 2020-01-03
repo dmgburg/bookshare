@@ -100,13 +100,13 @@ export default class AddBook extends React.Component {
                                 <img className="img-fluid w-100" alt="" src={this.state.imageURL ? this.state.imageURL : "/defaultCover.png" }/>
                             </span>
                             <label className="btn btn-block btn-primary mt-2">
-                                Загрузить <input onChange={this.onImageChange} type="file" style={{display: "none"}}/>
+                                Загрузить <input onChange={this.onImageChange} className="add-book-image" type="file" style={{display: "none"}}/>
                             </label>
                         </div>
                         <div className="col-md-10">
                             <div className="form-group col-sm-12 row mx-0">
                               <input type="text"
-                                     className="form-control"
+                                     className="form-control add-book-name"
                                      name="name"
                                      placeholder="Название"
                                      autoComplete="off"
@@ -115,7 +115,7 @@ export default class AddBook extends React.Component {
                             </div>
                             <div className="form-group col-sm-12 row mx-0">
                               <input type="text"
-                                     className="form-control"
+                                     className="form-control add-book-author"
                                      name="author"
                                      placeholder="Автор"
                                      autoComplete="off"
@@ -124,7 +124,7 @@ export default class AddBook extends React.Component {
                             </div>
                             <div className="form-group col-sm-12 row mx-0">
                               <textarea type="text"
-                                     className="form-control"
+                                     className="form-control add-book-description"
                                      name="description"
                                      placeholder="Описание"
                                      autoComplete="off"
@@ -135,7 +135,7 @@ export default class AddBook extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <div className="col-sm-12 row px-0 mx-0 my-3">
+                    <div className="col-sm-12 row px-0 mx-0 my-3 add-book-submit">
                         <input type="submit" className="btn btn-primary btn-block" value="Добавить"/>
                     </div>
                 </form>

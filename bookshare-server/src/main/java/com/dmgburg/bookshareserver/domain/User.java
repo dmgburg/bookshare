@@ -43,6 +43,14 @@ public class User implements UserDetails {
         return passwordSalt;
     }
 
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
     @Override
     public String toString() {
         return "User{" +

@@ -25,8 +25,6 @@ public class AuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         if (savedRequest == null) {
             try {
-                response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-                response.setHeader("Access-Control-Allow-Credentials", "true");
                 response.getWriter().write(authentication.getName());
                 response.getWriter().flush();
                 response.getWriter().close();

@@ -1,5 +1,6 @@
 import React from 'react';
 import { UserContext } from "../UserContext";
+import { ActionsRenderer } from "./ActionsRenderer";
 
 import { AgGridReact, AgGridColumn } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -54,7 +55,7 @@ export default class Books extends React.Component {
 
   async confirmHandover(id){
       const axios = this.context.axios;
-      const response = await axios.get("/api/book/confirmHandover/" + id)
+      const response = await axios.post("/api/book/confirmHandover/" + id)
       console.log(response.data)
       this.fetchState()
   }
@@ -134,91 +135,6 @@ export default class Books extends React.Component {
   }
 }
 Books.contextType = UserContext;
-
-class ActionsRenderer extends React.Component{
-    constructor(props) {
-        super(props);
-        this.handoverBook = this.handoverBook.bind(this);
-        this.confirmHandover = this.confirmHandover.bind(this);
-        this.askForBook = this.askForBook.bind(this);
-    }
-
-    handoverBook() {
-        this.props.context.componentParent.handoverBook(this.props.data.id)
-    }
-
-    confirmHandover() {
-        this.props.context.componentParent.confirmHandover(this.props.data.id)
-    }
-
-    askForBook() {
-        this.props.context.componentParent.askForBook(this.props.data.id)
-    }
-
-    render() {
-        if(this.props.data.notification && this.props.data.notification.type === "OWNER_WANTS_THE_BOOK" && this.props.data.notification.fromUser === this.props.context.email){
-            return(
-                <div>
-                    <div>
-                        <span>Вы попросили {this.props.data.holder} вернуть книгу прямо сейчас</span>
-                        <button className="btn btn-success btn-block" onClick={this.confirmHandover}>Забрал</button>
-                    </div>
-                </div>
-            )
-        } else if(!this.props.data.notification && this.props.data.owner === this.props.context.email && this.props.data.owner === this.props.data.holder){
-            return (
-                <div>
-                    <div>
-                        <span>Это Ваша книга</span>
-                    </div>
-                </div>
-            );
-        } else if(this.props.data.notification && this.props.data.notification.type === "QUEUE_NOT_EMPTY"){
-            return (
-                <div>
-                    <div>
-                        <button className="btn btn-success btn-block" onClick={this.handoverBook}> Передать книгу {this.props.data.notification.fromUser}</button>
-                    </div>
-                </div>
-            );
-        } else if(this.props.data.notification && this.props.data.notification.type === "BOOK_IS_WAITING" && this.props.data.notification.fromUser === this.props.context.email){
-            return(
-                <div>
-                    <div>
-                        <span>Вы пообещали книгу {this.props.data.notification.toUser}, если вы отдали книгу, напомните ему подтвердить</span>
-                    </div>
-                </div>
-            )
-        } else if(this.props.data.notification && this.props.data.notification.type === "BOOK_IS_WAITING" && this.props.data.notification.fromUser !== this.props.context.email){
-            return(
-                <div>
-                    <div>
-                        <span>{this.props.data.notification.fromUser} готов отдать книгу</span>
-                        <button className="btn btn-success btn-block" onClick={this.confirmHandover}>Забрал</button>
-                    </div>
-                </div>
-            )
-        } else if(this.props.data.notification && this.props.data.notification.type === "OWNER_WANTS_THE_BOOK" && this.props.data.notification.fromUser !== this.props.context.email){
-            return(
-                <div>
-                    <div>
-                        <span>Владелец книги {this.props.data.notification.fromUser} просит отдать книгу сейчас</span>
-                    </div>
-                </div>
-            )
-        } else if(this.props.data.owner === this.props.context.email && this.props.data.owner !== this.props.data.holder){
-            return (
-                <div>
-                    <div>
-                        <span>Это Ваша книга. Сейчас она у {this.props.data.holder}</span>
-                        <button className="btn btn-success btn-block" onClick={this.askForBook}>Попросить вернуть книгу сейчac</button>
-                    </div>
-                </div>
-            );
-        }
-        return null
-    }
-}
 
 class DetailsRenderer extends React.Component{
     render() {

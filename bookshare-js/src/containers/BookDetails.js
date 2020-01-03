@@ -11,6 +11,7 @@ export default class BookDetails extends React.Component {
         }
         this.askForBook = this.askForBook.bind(this)
         this.handoverBook = this.handoverBook.bind(this)
+        this.confirmHandover = this.confirmHandover.bind(this)
         this.removeFromQueue = this.removeFromQueue.bind(this)
     }
 
@@ -23,7 +24,14 @@ export default class BookDetails extends React.Component {
 
     async handoverBook(){
         const axios = this.context.axios;
-        const response = await axios.get("/api/book/handoverBook/" + this.state.book.id)
+        const response = await axios.post("/api/book/handoverBook/" + this.state.book.id)
+        console.log(response.data)
+        this.fetchState()
+    }
+
+    async confirmHandover(){
+        const axios = this.context.axios;
+        const response = await axios.post("/api/book/confirmHandover/" + this.state.book.id)
         console.log(response.data)
         this.fetchState()
     }
@@ -61,28 +69,29 @@ export default class BookDetails extends React.Component {
                         </span>
                     </div>
                     <div className="col-md-8">
-                          <h1 className="col-sm-12 ">{this.state.book.name}</h1>
+                          <h1 className="col-sm-12 details-name">{this.state.book.name}</h1>
                         <div className="row">
                           <div className="col-sm-3 font-weight-bold">Автор</div>
-                          <div className="col-sm-9">{this.state.book.author}</div>
+                          <div className="col-sm-9 details-author">{this.state.book.author}</div>
                         </div>
                         <div className="row">
                           <div className="col-sm-3 font-weight-bold">Владелец</div>
-                          <div className="col-sm-9">{this.state.book.owner}</div>
+                          <div className="col-sm-9 details-owner">{this.state.book.owner}</div>
                         </div>
                         <div className="row">
                           <div className="col-sm-3 font-weight-bold">Сейчас книга у</div>
-                          <div className="col-sm-9">{this.state.book.holder}</div>
+                          <div className="col-sm-9 details-holder">{this.state.book.holder}</div>
                         </div>
                         <BookQueue book={this.state.book}
                             askForBook={this.askForBook}
                             handoverBook={this.handoverBook}
+                            confirmHandover={this.confirmHandover}
                             removeFromQueue={this.removeFromQueue}/>
                     </div>
                 </div>
                 <h3 className="row mx-0">О книге</h3>
                 <div className="row mx-0">
-                  <div className="col-sm-12">{this.state.book.description}</div>
+                  <div className="col-sm-12 details-description">{this.state.book.description}</div>
                 </div>
             </div>
           )

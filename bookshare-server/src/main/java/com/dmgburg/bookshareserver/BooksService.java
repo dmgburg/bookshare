@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -98,8 +99,16 @@ public class BooksService {
         }
         Book book = optionalBook.get();
         List<String> userQueue = book.getUserQueue();
-
-        if (userQueue.isEmpty() && book.getNotification() == null) {
+        Notification currentNotification = book.getNotification();
+        if (book.getOwner().equals(principal.getName())){
+            Notification notification = new Notification()
+                    .setToUser(principal.getName())
+                    .setFromUser(book.getHolder())
+                    .setBook(book.getId())
+                    .setType(Notification.Type.OWNER_WANTS_THE_BOOK);
+            book.setNotification(notification);
+            notificationRepository.save(notification);
+        } else {
             Notification notification = new Notification()
                     .setToUser(book.getHolder())
                     .setFromUser(principal.getName())
@@ -107,19 +116,16 @@ public class BooksService {
                     .setType(Notification.Type.QUEUE_NOT_EMPTY);
             book.setNotification(notification);
             notificationRepository.save(notification);
-        } else if (book.getOwner().equals(principal.getName())){
-            Notification notification = new Notification()
-                    .setToUser(book.getHolder())
-                    .setFromUser(principal.getName())
-                    .setBook(book.getId())
-                    .setType(Notification.Type.QUEUE_NOT_EMPTY);
+            userQueue.add(principal.getName());
         }
-        userQueue.add(principal.getName());
         booksRepository.save(book);
+        if(currentNotification != null){
+            notificationRepository.delete(currentNotification);
+        }
         return ResponseEntity.ok(0L);
     }
 
-    @GetMapping("/confirmHandover/{id}")
+    @PostMapping("/confirmHandover/{id}")
     public ResponseEntity<String> confirmHandover(@PathVariable("id") Long id, Principal principal) throws IOException {
         Optional<Book> optionalBook = booksRepository.findById(id);
         if (!optionalBook.isPresent()) {
@@ -132,12 +138,16 @@ public class BooksService {
             return ResponseEntity.badRequest().body("Книга предназанчалась кому-то другому. Попросите админа сайта разобраться");
         }
         book = book.setNotification(null).setHolder(principal.getName());
+        List<String> userQueue = book.getUserQueue();
+        if(notification.getType() != Notification.Type.OWNER_WANTS_THE_BOOK) {
+            userQueue.remove(0);
+        }
         booksRepository.save(book);
         notificationRepository.delete(notification);
         return ResponseEntity.ok("");
     }
 
-    @GetMapping("/handoverBook/{id}")
+    @PostMapping("/handoverBook/{id}")
     public ResponseEntity<Long> handoverBook(@PathVariable("id") Long id, Principal principal) throws IOException {
         Optional<Book> optionalBook = booksRepository.findById(id);
         if (!optionalBook.isPresent()) {

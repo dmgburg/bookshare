@@ -90,7 +90,7 @@ export default class Register extends React.Component {
               <label htmlFor="email" className="col-sm-2 col-form-label row font-weight-bold mx-0">E-mail</label>
               <div className="col-sm-12 row mx-0">
                 <input type="text"
-                       className="form-control"
+                       className="form-control register-input-email"
                        name="email"
                        placeholder="E-mail"
                        value={this.state.email}
@@ -101,7 +101,7 @@ export default class Register extends React.Component {
               <label htmlFor="password" className="col-sm-12 col-form-label row font-weight-bold mx-0">Пароль</label>
               <div className="col-sm-12 row mx-0">
                 <input type="password"
-                        className={this.state.passwordValidationError ? "form-control is-invalid" : "form-control"}
+                        className={"form-control register-input-password" + (this.state.passwordValidationError ? " is-invalid" : "")}
                         name="password"
                         placeholder="Пароль"
                         onChange={this.handleChange}/>
@@ -111,7 +111,7 @@ export default class Register extends React.Component {
               <label htmlFor="password" className="col-sm-12 col-form-label row font-weight-bold mx-0">Пароль еще раз</label>
               <div className="col-sm-12 row mx-0">
                 <input type="password"
-                        className={this.state.passwordValidationError ? "form-control is-invalid" : "form-control"}
+                        className={"form-control register-input-password2" + (this.state.passwordValidationError ? " is-invalid" : "")}
                         name="password2"
                         placeholder="Пароль еще раз"
                         onChange={this.handleChange}/>
@@ -121,7 +121,7 @@ export default class Register extends React.Component {
               </div>
             </div>
             <div className="col-sm-12 row mx-0">
-              <input type="submit" disabled={this.state.passwordValidationError} className="btn btn-primary btn-block" value="Зарегистрироваться"/>
+              <input type="submit" disabled={this.state.passwordValidationError} className="btn btn-primary btn-block register-input-submit" value="Зарегистрироваться"/>
             </div>
            </form>
         </div>

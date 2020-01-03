@@ -41,11 +41,11 @@ class UserLoginBar extends React.Component {
         return (
         <div>
             <ul className="navbar-nav mr-auto my-0">
-                <li className="active text-center">
+                <li className="active text-center header-user-name">
                     <p className="nav-link my-0">{user}</p>
                 </li>
                 <li className="nav-item active">
-                    <button className="nav-link btn btn-outline-primary" onClick={this.handleClick}>Выйти</button>
+                    <button className="nav-link btn btn-outline-primary header-user-logout" onClick={this.handleClick}>Выйти</button>
                 </li>
             </ul>
         </div>
@@ -59,10 +59,10 @@ class GuestLoginBar extends React.Component {
     return (
             <div className="navbar-nav">
                 <div className="nav-item active">
-                    <Link className="nav-link btn btn-outline-primary" to="/signin">Войти</Link>
+                    <Link className="nav-link btn btn-outline-primary header-guest-login" to="/signin">Войти</Link>
                 </div>
                 <div className="nav-item active">
-                  <Link className="nav-link btn btn-success" to="/signup">Регистрация</Link>
+                  <Link className="nav-link btn btn-success header-guest-register" to="/signup">Регистрация</Link>
                 </div>
             </div>
     )

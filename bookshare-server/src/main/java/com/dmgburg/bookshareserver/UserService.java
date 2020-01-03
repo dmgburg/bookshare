@@ -65,13 +65,16 @@ public class UserService implements UserDetailsService {
     @ResponseBody
     public String userSalt(@RequestBody User user) {
         User byEmail = userRepository.findByEmail(user.getEmail().toLowerCase());
+        if(byEmail == null){
+            throw new IllegalArgumentException("Пользователь " + user.getEmail() + " не зарегистрирован");
+        }
         return byEmail.getPasswordSalt();
     }
 
     @PostMapping("/public/createUser")
     @ResponseBody
     public String addUser(@RequestBody User user) {
-        if(userRepository.findByEmail(user.getEmail()) != null){
+        if(userRepository.findByEmail(user.getEmail().toLowerCase()) != null){
             throw new IllegalArgumentException("Пользователь " + user.getEmail() + " уже зарегистрирован");
         }
         try (Session session = hibernateFactory.openSession()) {

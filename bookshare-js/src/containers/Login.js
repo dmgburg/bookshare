@@ -79,7 +79,7 @@ export default class Login extends React.Component {
                   <label htmlFor="email" className="col-sm-2 col-form-label row font-weight-bold mx-0">E-mail</label>
                   <div className="form-group col-sm-12 row mx-0">
                     <input type="text"
-                           className="form-control"
+                           className="form-control login-input-email"
                            name="email"
                            placeholder="E-mail"
                            value={this.state.email}
@@ -90,14 +90,14 @@ export default class Login extends React.Component {
                   <label htmlFor="password" className="col-sm-2 col-form-label row font-weight-bold mx-0">Пароль</label>
                   <div className="col-sm-12 row mx-0">
                     <input type="password"
-                            className="form-control"
+                            className="form-control login-input-password"
                             name="password"
                             placeholder="Пароль"
                             onChange={this.handleChange}/>
                   </div>
                 </div>
                 <div className="col-sm-12 row mx-0">
-                    <input type="submit" className="btn btn-primary btn-block" value="Войти"/>
+                    <input type="submit" className="btn btn-primary btn-block login-input-submit" value="Войти"/>
                 </div>
               </form>
             </div>
