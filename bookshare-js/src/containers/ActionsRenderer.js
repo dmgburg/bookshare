@@ -24,7 +24,6 @@ export class ActionsRenderer extends React.Component{
     render() {
         console.log("ActionRenderer data:", JSON.stringify(this.props.data, null, 2))
         if(this.props.data.notification) {
-            let notification = this.props.data.notification
             if(this.props.data.notification.type === "OWNER_WANTS_THE_BOOK"){
                 if(this.props.data.owner === this.props.context.email){
                     return(
