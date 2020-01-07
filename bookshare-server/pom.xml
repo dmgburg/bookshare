@@ -164,4 +164,15 @@
         </plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>travis</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>!travis</value>
+				</property>
+			</activation>
+		</profile>
+	</profiles>
 </project>

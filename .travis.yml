@@ -1,12 +1,11 @@
 language: java
-addons:
-  chrome: stable
+sudo: false
+script: mvn test -Denv=travis
 after_success:
 - chmod 400 id_rsa_travis
 - scp -i id_rsa_travis -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null bookshare-server/target/bookshare-server-1.0-SNAPSHOT.jar travis@80.211.145.89:/home/travis/bookshare
 - ssh -i id_rsa_travis -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null travis@80.211.145.89 bookshare/stopBookshare.sh
 - ssh -i id_rsa_travis -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null travis@80.211.145.89 bookshare/startBookshare.sh
 before_install:
-- /usr/bin/google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
 - openssl aes-256-cbc -K $encrypted_5325d21e7f69_key -iv $encrypted_5325d21e7f69_iv
   -in id_rsa_travis.enc -out id_rsa_travis -d
