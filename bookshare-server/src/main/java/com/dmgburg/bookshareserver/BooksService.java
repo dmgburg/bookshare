@@ -29,6 +29,7 @@ import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -58,21 +59,21 @@ public class BooksService {
 
     @GetMapping("/public/getBook/{id}")
     public ResponseEntity<Book> getBook(@PathVariable("id") Long id) {
-        return ResponseEntity.of(booksRepository.findById(id));
+        return booksRepository.findById(id)
+                .map(book -> ResponseEntity.ok().cacheControl(CacheControl.noCache()).body(book))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping(value = "/public/getCover/{id}")
     public ResponseEntity<byte[]> getCover(@PathVariable("id") Long coverId) {
-        Optional<Cover> optionalCover = coverRepository.findById(coverId);
-        if (!optionalCover.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        Cover cover = optionalCover.get();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.valueOf(cover.getMediaType()));
-        headers.setCacheControl(CacheControl.noCache().getHeaderValue());
-
-        return new ResponseEntity<>(cover.getData(), headers, HttpStatus.OK);
+        return coverRepository.findById(coverId)
+                .map(cover -> {
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentType(MediaType.valueOf(cover.getMediaType()));
+                    headers.setCacheControl(CacheControl.maxAge(60, TimeUnit.DAYS));
+                    return new ResponseEntity<>(cover.getData(), headers, HttpStatus.OK);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/myBooks")
@@ -100,7 +101,7 @@ public class BooksService {
         Book book = optionalBook.get();
         List<String> userQueue = book.getUserQueue();
         Notification currentNotification = book.getNotification();
-        if (book.getOwner().equals(principal.getName())){
+        if (book.getOwner().equals(principal.getName())) {
             Notification notification = new Notification()
                     .setToUser(principal.getName())
                     .setFromUser(book.getHolder())
@@ -119,7 +120,7 @@ public class BooksService {
             userQueue.add(principal.getName());
         }
         booksRepository.save(book);
-        if(currentNotification != null){
+        if (currentNotification != null) {
             notificationRepository.delete(currentNotification);
         }
         return ResponseEntity.ok(0L);
@@ -134,12 +135,12 @@ public class BooksService {
         Book book = optionalBook.get();
 
         Notification notification = book.getNotification();
-        if (!notification.getToUser().equals(principal.getName())){
+        if (!notification.getToUser().equals(principal.getName())) {
             return ResponseEntity.badRequest().body("Книга предназанчалась кому-то другому. Попросите админа сайта разобраться");
         }
         book = book.setNotification(null).setHolder(principal.getName());
         List<String> userQueue = book.getUserQueue();
-        if(notification.getType() != Notification.Type.OWNER_WANTS_THE_BOOK) {
+        if (notification.getType() != Notification.Type.OWNER_WANTS_THE_BOOK) {
             userQueue.remove(0);
         }
         booksRepository.save(book);
@@ -169,7 +170,7 @@ public class BooksService {
         return ResponseEntity.ok(0L);
     }
 
-    @GetMapping("/removeFromQueue/{id}")
+    @PostMapping("/removeFromQueue/{id}")
     public ResponseEntity<Long> removeFromQueue(@PathVariable("id") Long id, Principal principal) throws IOException {
         Optional<Book> optionalBook = booksRepository.findById(id);
         if (!optionalBook.isPresent()) {
@@ -177,7 +178,7 @@ public class BooksService {
         }
         Book book = optionalBook.get();
         book.getUserQueue().remove(principal.getName());
-        if(book.getUserQueue().isEmpty()){
+        if (book.getUserQueue().isEmpty()) {
             book.setNotification(null);
         } else {
             Notification notification = new Notification()

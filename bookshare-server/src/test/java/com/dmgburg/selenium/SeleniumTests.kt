@@ -28,7 +28,7 @@ class SeleniumTests {
             BookshareServerApplication.main(emptyArray())
         }
 
-        val serverUrl : String? = System.getProperty("server.url") ?: "http://localhost:8080"
+        val serverUrl: String? = System.getProperty("server.url") ?: "http://localhost:8080"
     }
 
     @Before
@@ -44,7 +44,9 @@ class SeleniumTests {
     private fun createDriver(): WebDriver {
         val options = ChromeOptions()
         options.setHeadless(true)
-        val driver = RemoteWebDriver(URL("http://localhost:9222"), DesiredCapabilities.chrome())
+        val driver =
+                if (System.getProperty("webdriver.chrome.driver") != null) ChromeDriver(options)
+                else RemoteWebDriver(URL("http://localhost:9222"), DesiredCapabilities.chrome())
         driver.manage()?.timeouts()?.implicitlyWait(10, TimeUnit.SECONDS)
         driver.get(serverUrl)
         return driver

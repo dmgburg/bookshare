@@ -38,7 +38,7 @@ export default class BookDetails extends React.Component {
 
     async removeFromQueue(){
         const axios = this.context.axios;
-        const response = await axios.get("/api/book/removeFromQueue/" + this.state.book.id)
+        const response = await axios.post("/api/book/removeFromQueue/" + this.state.book.id)
         console.log(response.data)
         this.fetchState()
     }
