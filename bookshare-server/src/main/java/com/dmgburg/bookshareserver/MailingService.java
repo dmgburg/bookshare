@@ -28,10 +28,10 @@ public class MailingService {
                             @Value("${dmgburg.mail.username}") String username,
                             @Value("${dmgburg.mail.password}") String password) {
         Properties prop = new Properties();
-        prop.put("mail.smtp.auth", "true");
-        prop.put("mail.smtp.starttls.enable", "true");
-        prop.put("mail.smtp.host", "smtp.gmail.com");
-        prop.put("mail.smtp.port", "587");
+        prop.setProperty("mail.smtp.auth", "true");
+        prop.setProperty("mail.smtp.starttls.enable", "true");
+        prop.setProperty("mail.smtp.host", "smtp.gmail.com");
+        prop.setProperty("mail.smtp.port", "587");
         this.session = Session.getInstance(prop, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {

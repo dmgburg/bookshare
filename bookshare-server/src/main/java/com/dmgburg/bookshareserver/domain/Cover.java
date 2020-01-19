@@ -20,9 +20,18 @@ public class Cover {
     @JsonProperty("mediaType")
     private String mediaType;
 
-    @Lob
     @JsonProperty("data")
     private byte[] data;
+
+    private String filename;
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
 
     public Long getId() {
         return id;

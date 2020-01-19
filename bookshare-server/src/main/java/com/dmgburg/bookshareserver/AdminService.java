@@ -19,16 +19,13 @@ public class AdminService {
 
     private final JdbcTemplate jdbcTemplate;
     private final BooksRepository booksRepository;
-    private final CoverRepository coverRepository;
     private final NotificationRepository notificationRepository;
 
     public AdminService(DataSource dataSource,
                         BooksRepository booksRepository,
-                        CoverRepository coverRepository,
                         NotificationRepository notificationRepository,
                         MailingService mailingService) {
         this.booksRepository = booksRepository;
-        this.coverRepository = coverRepository;
         this.notificationRepository = notificationRepository;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
