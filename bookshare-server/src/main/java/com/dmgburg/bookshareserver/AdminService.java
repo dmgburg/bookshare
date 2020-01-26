@@ -1,8 +1,8 @@
 package com.dmgburg.bookshareserver;
 
+import com.dmgburg.book.mail.MailingService;
 import com.dmgburg.bookshareserver.domain.Book;
 import com.dmgburg.bookshareserver.repository.BooksRepository;
-import com.dmgburg.bookshareserver.repository.CoverRepository;
 import com.dmgburg.bookshareserver.repository.NotificationRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;

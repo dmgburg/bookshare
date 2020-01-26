@@ -1,5 +1,6 @@
 package com.dmgburg.bookshareserver
 
+import com.dmgburg.book.mail.MailingService
 import com.dmgburg.bookshareserver.domain.Book
 import com.dmgburg.bookshareserver.domain.Cover
 import com.dmgburg.bookshareserver.domain.Notification
@@ -32,7 +33,7 @@ class BooksService(private val booksRepository: BooksRepository,
         val allCovers = coverRepository.findAll()
         val nonMigrated = allCovers.filter { it.data != null && it.data.isNotEmpty()}
         nonMigrated.forEach{
-            val filename = coverStorage.saveCover(it)
+            val filename = coverStorage.saveCover(it.data)
             it.filename = filename
             it.data = null
             coverRepository.save(it)
@@ -204,9 +205,8 @@ class BooksService(private val booksRepository: BooksRepository,
     @Throws(IOException::class)
     fun addCover(@RequestParam("data") data: MultipartFile): Long {
         val cover = Cover()
-        cover.data = data.bytes
         cover.mediaType = data.contentType
-        val filename = coverStorage.saveCover(cover)
+        val filename = coverStorage.saveCover(data.bytes)
         cover.filename = filename
         val save = coverRepository.save(cover)
         return save.id

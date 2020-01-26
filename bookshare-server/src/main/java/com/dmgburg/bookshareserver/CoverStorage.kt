@@ -18,12 +18,12 @@ class CoverStorage(@Value("\${coversRoot:.}") val rootFolder: String) {
         return if (file.exists()) file.readBytes() else ByteArray(0)
     }
 
-    fun saveCover(cover: Cover): String {
+    fun saveCover(data: ByteArray): String {
         var coverFile = file(generateName())
         while (coverFile.exists()) {
             coverFile = file(generateName())
         }
-        coverFile.writeBytes(cover.data)
+        coverFile.writeBytes(data)
         return coverFile.name
     }
 

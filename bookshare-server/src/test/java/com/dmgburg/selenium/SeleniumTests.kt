@@ -1,10 +1,6 @@
 package com.dmgburg.selenium
 
-import com.dmgburg.bookshareserver.BookshareServerApplication
-import com.dmgburg.findElementByClassName
-import com.dmgburg.getRelative
-import com.dmgburg.randomStr
-import com.dmgburg.waitForClass
+import com.dmgburg.*
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
@@ -25,7 +21,7 @@ class SeleniumTests {
         @BeforeClass
         fun startServer() {
             System.setProperty("spring.profiles.active", "test")
-            BookshareServerApplication.main(emptyArray())
+            BookshareServerTestApplication.main(emptyArray())
         }
 
         val serverUrl: String? = System.getProperty("server.url") ?: "http://localhost:8080"
@@ -43,7 +39,7 @@ class SeleniumTests {
 
     private fun createDriver(): WebDriver {
         val options = ChromeOptions()
-        options.setHeadless(true)
+//        options.setHeadless(true)
         val driver =
                 if (System.getProperty("webdriver.chrome.driver") != null) ChromeDriver(options)
                 else RemoteWebDriver(URL("http://localhost:9222"), DesiredCapabilities.chrome())
@@ -64,6 +60,7 @@ class SeleniumTests {
         guest.goToRegister()
         val registerPage = RegisterPage(this)
         registerPage.registerUser(user, password)
+        registerPage.confirmEmail(user)
     }
 
     private fun WebDriver.addBookAndCheck(user: String): Long {
@@ -113,6 +110,20 @@ class SeleniumTests {
             val (user, _) = newLogin()
             val userHeader = UserHeader(this)
             assert(userHeader.username == user.toLowerCase())
+        }
+    }
+
+    @Test
+    fun testUserMustConfirmEmailBeforeLogin() {
+        withAndClose(createDriver()) {
+            val user = randomStr() + "registerTest"
+            val password = randomStr()
+            val guest = GuestHeader(this)
+            guest.goToRegister()
+            val registerPage = RegisterPage(this)
+            registerPage.registerUser(user, password)
+            loginUser(user.toLowerCase(), password)
+            println("AAAAAAAAAAAAA")
         }
     }
 

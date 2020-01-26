@@ -1,5 +1,7 @@
 package com.dmgburg.selenium
 
+import com.dmgburg.TestMailingService
+import com.dmgburg.getRelative
 import com.dmgburg.waitForClass
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
@@ -27,5 +29,10 @@ class RegisterPage(private val driver: WebDriver) {
         password2Box?.sendKeys(password)
         submitButton?.click()
         driver.waitForClass("login-input-email")
+    }
+
+    fun confirmEmail(user: String) {
+        val confirmationHash = TestMailingService.cofirmationMessages[user.toLowerCase()]
+        driver.getRelative("/api/user/public/confirmUser/$user/$confirmationHash")
     }
 }
