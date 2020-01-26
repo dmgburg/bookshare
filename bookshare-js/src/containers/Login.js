@@ -2,6 +2,7 @@ import React from 'react';
 import crypto from 'crypto';
 import { UserContext } from "../UserContext";
 import { withRouter } from "react-router";
+import VK, { Auth } from "react-vk";
 
 export default class Login extends React.Component {
   constructor(props) {
@@ -99,6 +100,9 @@ export default class Login extends React.Component {
                 <div className="col-sm-12 row mx-0">
                     <input type="submit" className="btn btn-primary btn-block login-input-submit" value="Войти"/>
                 </div>
+                <VK apiId={7296141}>
+                  <Auth />
+                </VK>
               </form>
             </div>
           </div>
