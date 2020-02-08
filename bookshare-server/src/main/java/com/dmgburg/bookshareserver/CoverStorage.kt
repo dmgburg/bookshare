@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadLocalRandom
 import kotlin.streams.asSequence
 
 @Component
-class CoverStorage(@Value("\${coversRoot:.}") val rootFolder: String) {
+class CoverStorage(@Value("\${dmgburg.coversRoot:.}") val rootFolder: String) {
     private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
     private val STRING_LENGTH: Long = 20L
 
